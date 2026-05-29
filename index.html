@@ -663,16 +663,16 @@ h1 {
 <div class="toast" id="toast"></div>
 <div class="loading-overlay" id="loading"><div class="spinner"></div><span>施法中…</span></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 // ═══════════════════════════════════════════
-//  数据存储：localStorage（本地持久化）
-//  每个帖子结构：{ id, herbName, quantity, playerId,
-//                 matureTime, expireTime, rarity, note,
-//                 createdAt, ownerId }
+//  Supabase 配置
 // ═══════════════════════════════════════════
+const SUPABASE_URL = 'https://ygslzwiznvcfujonvblq.supabase.co'
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlnc2x6d2l6bnZjZnVqb252YmxxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNDM4NjksImV4cCI6MjA5NTYxOTg2OX0.J9P1NyK5tiSzPZgDeLpwfS2eRaFrP5Gb4fgpmA258vA'
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
-const STORAGE_KEY = 'herb_share_posts_v1';
-const OWNER_KEY   = 'herb_share_owner_id';
+const OWNER_KEY = 'herb_share_owner_id'
 const FILTERS = [
   { id:'all',      label:'全部' },
   { id:'ready',    label:'✅ 已成熟' },
@@ -682,176 +682,211 @@ const FILTERS = [
   { id:'rare',     label:'稀有' },
   { id:'epic',     label:'史诗' },
   { id:'legend',   label:'传说' },
-];
-const RARITY_LABELS = { common:'普通', rare:'稀有', epic:'史诗', legend:'传说' };
+]
+const RARITY_LABELS = { common:'普通', rare:'稀有', epic:'史诗', legend:'传说' }
 const HERB_ICONS = {
   default:'🌿', '玫瑰':'🌹', '灵芝':'🍄', '人参':'🌱', '薄荷':'🌿',
   '龙血草':'🌺', '月见草':'🌙', '金银花':'🌼', '当归':'🍀',
   '羽衣草':'🌿', '睡莲':'🪷', '向日葵':'🌻', '绣球花':'💐',
   '牡丹':'🌸', '铃兰':'🌷', '五月花':'🌺',
-};
+  '天竺葵':'🌸', '泡泡豆荚':'🫛', '嗅幻草':'🌿', '曼德拉草':'🌱',
+  '咬人甘蓝':'🥬', '秋海棠':'🌺', '水仙':'🌼', '囊鳃草':'🌿',
+  '三色堇':'🌷', '绿菊':'🌻', '巨藻':'🌊', '红火焰藻':'🔴',
+  '红波水草':'🌊', '凤眼莲':'💜', '菱叶丁香蓼':'🌿', '米布米宝':'🌱',
+  '龙舌兰香草':'🌵', '幽兰月桂':'🌿', '火焰肉桂':'🔥', '迷迭香':'🌿', '鼠尾草':'🌿',
+}
 
-let allPosts = [];
-let filteredPosts = [];
-let activeFilter = 'all';
-let searchKw = '';
-let selectedRarity = 'common';
-let myOwnerId = '';
-let timer = null;
+let allPosts = []
+let filteredPosts = []
+let activeFilter = 'all'
+let searchKw = ''
+let selectedRarity = 'common'
+let myOwnerId = ''
+let realtimeSub = null
+let refreshTimer = null
 
 // ── 初始化 ──
-function init() {
-  myOwnerId = localStorage.getItem(OWNER_KEY) || '';
+async function init() {
+  myOwnerId = localStorage.getItem(OWNER_KEY) || ''
   if (!myOwnerId) {
-    myOwnerId = 'user_' + Math.random().toString(36).slice(2,10);
-    localStorage.setItem(OWNER_KEY, myOwnerId);
+    myOwnerId = 'user_' + Math.random().toString(36).slice(2,10)
+    localStorage.setItem(OWNER_KEY, myOwnerId)
   }
-  document.getElementById('myIdDisplay').textContent = myOwnerId;
+  document.getElementById('myIdDisplay').textContent = myOwnerId
 
-  // 设置今天日期为默认值
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('fMatureDate').value = today;
-  document.getElementById('fExpireDate').value = today;
+  const today = new Date().toISOString().split('T')[0]
+  document.getElementById('fMatureDate').value = today
+  document.getElementById('fExpireDate').value = today
 
-  buildFilters();
-  loadPosts();
-  timer = setInterval(() => { recomputeStatus(); }, 30000);
+  buildFilters()
+  await loadPosts()
 
-  // 监听 storage 事件（多标签同步）
-  window.addEventListener('storage', e => {
-    if (e.key === STORAGE_KEY) loadPosts();
-  });
+  // 实时订阅：有人发布/删除立即刷新
+  realtimeSub = sb
+    .channel('herb_posts_changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'herb_posts' }, () => {
+      loadPosts()
+    })
+    .subscribe()
+
+  // 每分钟本地刷新倒计时
+  refreshTimer = setInterval(() => recomputeStatus(), 60000)
 }
 
 // ── 身份管理 ──
 function changeId() {
-  const newId = prompt('输入新的游戏ID（将用于发布帖子）:', myOwnerId);
+  const newId = prompt('输入新的游戏ID（将用于发布帖子）:', myOwnerId)
   if (newId && newId.trim()) {
-    myOwnerId = newId.trim();
-    localStorage.setItem(OWNER_KEY, myOwnerId);
-    document.getElementById('myIdDisplay').textContent = myOwnerId;
-    document.getElementById('fPlayerId').value = myOwnerId;
-    showToast('身份已更新');
+    myOwnerId = newId.trim()
+    localStorage.setItem(OWNER_KEY, myOwnerId)
+    document.getElementById('myIdDisplay').textContent = myOwnerId
+    showToast('身份已更新')
   }
 }
 
 // ── 筛选标签 ──
 function buildFilters() {
-  const el = document.getElementById('filterScroll');
+  const el = document.getElementById('filterScroll')
   el.innerHTML = FILTERS.map(f =>
     `<span class="filter-tag ${f.id==='all'?'active':''}" data-id="${f.id}" onclick="setFilter(this)">${f.label}</span>`
-  ).join('');
+  ).join('')
 }
 
 function setFilter(el) {
-  document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  activeFilter = el.dataset.id;
-  applyFilter();
+  document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'))
+  el.classList.add('active')
+  activeFilter = el.dataset.id
+  applyFilter()
 }
 
-// ── 数据加载 ──
-function loadPosts() {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  const now = Date.now();
-  let posts = raw ? JSON.parse(raw) : [];
-  // 清理过期
-  posts = posts.filter(p => p.expireTime > now);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
-  allPosts = posts.map(p => processPost(p, now));
-  applyFilter();
+// ── 数据加载（Supabase）──
+async function loadPosts() {
+  showLoading(true)
+  try {
+    const now = Date.now()
+
+    // 清理自己发的过期帖
+    await sb.from('herb_posts')
+      .delete()
+      .eq('owner_id', myOwnerId)
+      .lt('expire_time', now)
+
+    // 读取所有未过期帖子
+    const { data, error } = await sb
+      .from('herb_posts')
+      .select('*')
+      .gt('expire_time', now)
+      .order('expire_time', { ascending: true })
+      .limit(200)
+
+    if (error) throw error
+
+    allPosts = (data || []).map(p => processPost(p, now))
+    applyFilter()
+  } catch (e) {
+    console.error('加载失败', e)
+    showToast('加载失败，请刷新重试', true)
+  } finally {
+    showLoading(false)
+  }
 }
 
 function processPost(p, now) {
-  const isMature = now >= p.matureTime;
-  const timeLeft = p.expireTime - now;
-  const totalSpan = p.expireTime - p.matureTime;
-  const elapsed = now - p.matureTime;
-  const progressPct = (isMature && totalSpan > 0)
-    ? Math.min(100, Math.round(elapsed / totalSpan * 100)) : 0;
-  const expireSoon = timeLeft < 2 * 3600 * 1000;
+  // Supabase 返回 snake_case，统一转换
+  const matureTime = p.mature_time || p.matureTime
+  const expireTime = p.expire_time || p.expireTime
+  const herbName   = p.herb_name  || p.herbName
+  const playerId   = p.player_id  || p.playerId
+  const ownerId    = p.owner_id   || p.ownerId
 
-  let status, statusLabel;
-  if (!isMature)      { status='growing';  statusLabel='🌱 生长中'; }
-  else if (expireSoon){ status='expiring'; statusLabel='⚠️ 快收取'; }
-  else                { status='ready';    statusLabel='✅ 已成熟'; }
+  const isMature   = now >= matureTime
+  const timeLeft   = expireTime - now
+  const totalSpan  = expireTime - matureTime
+  const elapsed    = now - matureTime
+  const progressPct = (isMature && totalSpan > 0)
+    ? Math.min(100, Math.round(elapsed / totalSpan * 100)) : 0
+  const expireSoon = timeLeft < 2 * 3600 * 1000
+
+  let status, statusLabel
+  if (!isMature)       { status='growing';  statusLabel='🌱 生长中' }
+  else if (expireSoon) { status='expiring'; statusLabel='⚠️ 快收取' }
+  else                 { status='ready';    statusLabel='✅ 已成熟' }
 
   const countdownStr = !isMature
-    ? `还需 ${fmtDur(p.matureTime - now)} 成熟`
-    : `${fmtDur(timeLeft)} 后收取`;
+    ? `还需 ${fmtDur(matureTime - now)} 成熟`
+    : `${fmtDur(timeLeft)} 后收取`
 
-  return { ...p, status, statusLabel, countdownStr,
+  return {
+    id: p.id,
+    herbName, quantity: p.quantity,
+    playerId, ownerId,
+    matureTime, expireTime,
+    rarity: p.rarity || 'common',
+    note: p.note || '',
+    status, statusLabel, countdownStr,
     progressPct, expireSoon,
-    matureStr: fmtDt(p.matureTime),
-    expireStr:  fmtDt(p.expireTime),
+    matureStr: fmtDt(matureTime),
+    expireStr:  fmtDt(expireTime),
     rarityLabel: RARITY_LABELS[p.rarity] || '普通',
-    icon: HERB_ICONS[p.herbName] || HERB_ICONS.default,
-    isOwn: p.ownerId === myOwnerId,
-  };
+    icon: HERB_ICONS[herbName] || HERB_ICONS.default,
+    isOwn: ownerId === myOwnerId,
+  }
 }
 
 function recomputeStatus() {
-  const now = Date.now();
-  allPosts = allPosts
-    .filter(p => p.expireTime > now)
-    .map(p => processPost(p, now));
-  // 同步清理 storage
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (raw) {
-    const clean = JSON.parse(raw).filter(p => p.expireTime > now);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(clean));
-  }
-  applyFilter();
+  const now = Date.now()
+  allPosts = allPosts.filter(p => p.expireTime > now).map(p => processPost(p, now))
+  applyFilter()
 }
 
 // ── 搜索 & 筛选 ──
 function onSearch() {
-  searchKw = document.getElementById('searchInput').value;
-  document.getElementById('clearBtn').style.display = searchKw ? 'block' : 'none';
-  applyFilter();
+  searchKw = document.getElementById('searchInput').value
+  document.getElementById('clearBtn').style.display = searchKw ? 'block' : 'none'
+  applyFilter()
 }
 
 function clearSearch() {
-  document.getElementById('searchInput').value = '';
-  searchKw = '';
-  document.getElementById('clearBtn').style.display = 'none';
-  applyFilter();
+  document.getElementById('searchInput').value = ''
+  searchKw = ''
+  document.getElementById('clearBtn').style.display = 'none'
+  applyFilter()
 }
 
 function applyFilter() {
-  let list = [...allPosts];
+  let list = [...allPosts]
   if (searchKw.trim()) {
-    const kw = searchKw.trim().toLowerCase();
+    const kw = searchKw.trim().toLowerCase()
     list = list.filter(p =>
       p.herbName.toLowerCase().includes(kw) ||
       p.playerId.toLowerCase().includes(kw) ||
       (p.note||'').toLowerCase().includes(kw)
-    );
+    )
   }
   if (activeFilter !== 'all') {
     if (['growing','ready','expiring'].includes(activeFilter)) {
-      list = list.filter(p => p.status === activeFilter);
+      list = list.filter(p => p.status === activeFilter)
     } else {
-      list = list.filter(p => p.rarity === activeFilter);
+      list = list.filter(p => p.rarity === activeFilter)
     }
   }
   list.sort((a,b) => {
-    if (a.status==='ready' && b.status!=='ready') return -1;
-    if (b.status==='ready' && a.status!=='ready') return 1;
-    return a.expireTime - b.expireTime;
-  });
-  filteredPosts = list;
-  document.getElementById('statTotal').textContent = allPosts.length;
-  document.getElementById('statShown').textContent = list.length;
-  renderList();
+    if (a.status==='ready' && b.status!=='ready') return -1
+    if (b.status==='ready' && a.status!=='ready') return 1
+    return a.expireTime - b.expireTime
+  })
+  filteredPosts = list
+  document.getElementById('statTotal').textContent = allPosts.length
+  document.getElementById('statShown').textContent = list.length
+  renderList()
 }
 
 // ── 渲染 ──
 function renderList() {
-  const el = document.getElementById('postList');
+  const el = document.getElementById('postList')
   if (!filteredPosts.length) {
-    el.innerHTML = `<div class="empty-state"><span class="ei">🌱</span><p>暂无相关草药帖子</p></div>`;
-    return;
+    el.innerHTML = `<div class="empty-state"><span class="ei">🌱</span><p>暂无相关草药帖子</p></div>`
+    return
   }
   el.innerHTML = filteredPosts.map((p, i) => `
     <div class="post-card rarity-${p.rarity}" style="animation-delay:${i*40}ms" onclick="openDetail('${p.id}')">
@@ -882,103 +917,105 @@ function renderList() {
       ${p.note ? `<div class="card-note">💬 ${esc(p.note)}</div>` : ''}
       ${p.isOwn ? `<span class="delete-btn" onclick="deletePost(event,'${p.id}')">删除</span>` : ''}
     </div>
-  `).join('');
+  `).join('')
 }
 
 // ── 发布 ──
 function openPublish() {
-  // 预填游戏ID
   if (myOwnerId && !myOwnerId.startsWith('user_')) {
-    document.getElementById('fPlayerId').value = myOwnerId;
+    document.getElementById('fPlayerId').value = myOwnerId
+  } else {
+    document.getElementById('fPlayerId').value = ''
   }
-  // 预填今天日期
-  const today = new Date().toISOString().split('T')[0];
-  if (!document.getElementById('fMatureDate').value) document.getElementById('fMatureDate').value = today;
-  if (!document.getElementById('fExpireDate').value) document.getElementById('fExpireDate').value = today;
-  document.getElementById('publishModal').classList.add('open');
+  document.getElementById('publishModal').classList.add('open')
 }
 
 function closePublish() {
-  document.getElementById('publishModal').classList.remove('open');
+  document.getElementById('publishModal').classList.remove('open')
 }
 
 function setRarity(el) {
-  document.querySelectorAll('#rarityPicker .rarity-opt').forEach(o => {
-    o.className = 'rarity-opt';
-  });
-  el.className = `rarity-opt sel-${el.dataset.r}`;
-  selectedRarity = el.dataset.r;
+  document.querySelectorAll('#rarityPicker .rarity-opt').forEach(o => o.className = 'rarity-opt')
+  el.className = `rarity-opt sel-${el.dataset.r}`
+  selectedRarity = el.dataset.r
 }
 
-function submitPost() {
-  const herbName = document.getElementById('fHerbName').value.trim();
-  const qty      = document.getElementById('fQty').value.trim();
-  const playerId = document.getElementById('fPlayerId').value.trim();
-  const md = document.getElementById('fMatureDate').value;
-  const mt = document.getElementById('fMatureTime').value;
-  const ed = document.getElementById('fExpireDate').value;
-  const et = document.getElementById('fExpireTime').value;
-  const note = document.getElementById('fNote').value.trim();
+async function submitPost() {
+  const herbName = document.getElementById('fHerbName').value.trim()
+  const qty      = document.getElementById('fQty').value.trim()
+  const playerId = document.getElementById('fPlayerId').value.trim()
+  const md = document.getElementById('fMatureDate').value
+  const mt = document.getElementById('fMatureTime').value
+  const ed = document.getElementById('fExpireDate').value
+  const et = document.getElementById('fExpireTime').value
+  const note = document.getElementById('fNote').value.trim()
 
-  if (!herbName) return showToast('请填写草药名称', true);
-  if (!qty || isNaN(+qty) || +qty < 1) return showToast('请填写正确的数量', true);
-  if (!playerId) return showToast('请填写游戏ID', true);
-  if (!md || !mt) return showToast('请填写成熟时间', true);
-  if (!ed || !et) return showToast('请填写收取截止时间', true);
+  if (!herbName) return showToast('请填写草药名称', true)
+  if (!qty || isNaN(+qty) || +qty < 1) return showToast('请填写正确的数量', true)
+  if (!playerId) return showToast('请填写游戏ID', true)
+  if (!md || !mt) return showToast('请填写成熟时间', true)
+  if (!ed || !et) return showToast('请填写收取截止时间', true)
 
-  const matureTs = new Date(`${md}T${mt}`).getTime();
-  const expireTs = new Date(`${ed}T${et}`).getTime();
+  const matureTs = new Date(`${md}T${mt}`).getTime()
+  const expireTs = new Date(`${ed}T${et}`).getTime()
 
-  if (isNaN(matureTs)) return showToast('成熟时间格式有误', true);
-  if (isNaN(expireTs)) return showToast('收取截止时间格式有误', true);
-  if (expireTs <= matureTs) return showToast('收取截止须晚于成熟时间', true);
-  if (expireTs <= Date.now()) return showToast('收取截止时间已过期', true);
+  if (isNaN(matureTs)) return showToast('成熟时间格式有误', true)
+  if (isNaN(expireTs)) return showToast('收取截止时间格式有误', true)
+  if (expireTs <= matureTs) return showToast('收取截止须晚于成熟时间', true)
+  if (expireTs <= Date.now()) return showToast('收取截止时间已过期', true)
 
-  // 保存游戏ID
-  if (!myOwnerId.startsWith('user_') || playerId !== myOwnerId) {
-    // 如果用户填了具体ID，用作身份
+  // 保存游戏ID为本地身份
+  myOwnerId = playerId
+  localStorage.setItem(OWNER_KEY, myOwnerId)
+  document.getElementById('myIdDisplay').textContent = myOwnerId
+
+  showLoading(true)
+  try {
+    const { error } = await sb.from('herb_posts').insert({
+      herb_name:   herbName,
+      quantity:    +qty,
+      player_id:   playerId,
+      mature_time: matureTs,
+      expire_time: expireTs,
+      rarity:      selectedRarity,
+      note,
+      owner_id:    myOwnerId,
+      created_at:  Date.now(),
+    })
+    if (error) throw error
+
+    closePublish()
+    showToast('发布成功！🌿')
+    ;['fHerbName','fQty','fNote'].forEach(id => document.getElementById(id).value = '')
+    // 实时订阅会自动触发 loadPosts，无需手动调用
+  } catch(e) {
+    console.error('发布失败', e)
+    showToast('发布失败：' + (e.message || '请重试'), true)
+  } finally {
+    showLoading(false)
   }
-  localStorage.setItem(OWNER_KEY, playerId);
-  myOwnerId = playerId;
-  document.getElementById('myIdDisplay').textContent = myOwnerId;
-
-  const newPost = {
-    id: 'p_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
-    herbName, quantity: +qty, playerId,
-    matureTime: matureTs, expireTime: expireTs,
-    rarity: selectedRarity, note,
-    createdAt: Date.now(),
-    ownerId: myOwnerId,
-  };
-
-  const raw = localStorage.getItem(STORAGE_KEY);
-  const posts = raw ? JSON.parse(raw) : [];
-  posts.push(newPost);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
-
-  closePublish();
-  showToast('发布成功！🌿');
-  // 清空表单
-  ['fHerbName','fQty','fNote'].forEach(id => document.getElementById(id).value = '');
-  loadPosts();
 }
 
-function deletePost(e, id) {
-  e.stopPropagation();
-  if (!confirm('确认删除这条草药信息？')) return;
-  const raw = localStorage.getItem(STORAGE_KEY);
-  const posts = raw ? JSON.parse(raw) : [];
-  const updated = posts.filter(p => p.id !== id);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-  showToast('已删除');
-  loadPosts();
+async function deletePost(e, id) {
+  e.stopPropagation()
+  if (!confirm('确认删除这条草药信息？')) return
+  showLoading(true)
+  try {
+    const { error } = await sb.from('herb_posts').delete().eq('id', id)
+    if (error) throw error
+    showToast('已删除')
+  } catch(e) {
+    showToast('删除失败：' + (e.message || '请重试'), true)
+  } finally {
+    showLoading(false)
+  }
 }
 
 // ── 详情 ──
 function openDetail(id) {
-  const p = filteredPosts.find(x => x.id === id);
-  if (!p) return;
-  document.getElementById('detailTitle').textContent = `🌿 ${p.herbName}`;
+  const p = filteredPosts.find(x => x.id === id)
+  if (!p) return
+  document.getElementById('detailTitle').textContent = `🌿 ${p.herbName}`
   document.getElementById('detailBody').innerHTML = `
     <div class="detail-body">
       <div class="detail-herb-name">${esc(p.herbName)} <span style="font-size:14px;color:var(--text-dim)">×${p.quantity}</span></div>
@@ -990,49 +1027,52 @@ function openDetail(id) {
       <div class="detail-row"><span class="detail-key">倒计时</span><span class="detail-val">${p.countdownStr}</span></div>
       ${p.note ? `<div class="detail-note-box">💬 ${esc(p.note)}</div>` : ''}
     </div>
-  `;
-  document.getElementById('detailModal').classList.add('open');
+  `
+  document.getElementById('detailModal').classList.add('open')
 }
 
 function closeDetail() {
-  document.getElementById('detailModal').classList.remove('open');
+  document.getElementById('detailModal').classList.remove('open')
 }
 
-// ── 弹窗点击背景关闭 ──
 function onMaskClick(e, id) {
   if (e.target === document.getElementById(id)) {
-    document.getElementById(id).classList.remove('open');
+    document.getElementById(id).classList.remove('open')
   }
 }
 
-// ── 工具 ──
+// ── 工具函数 ──
 function fmtDt(ts) {
-  const d = new Date(ts);
-  const pad = n => String(n).padStart(2,'0');
-  return `${d.getMonth()+1}/${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  const d = new Date(ts)
+  const pad = n => String(n).padStart(2,'0')
+  return `${d.getMonth()+1}/${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 
 function fmtDur(ms) {
-  if (ms <= 0) return '0分钟';
-  const h = Math.floor(ms / 3600000);
-  const m = Math.floor((ms % 3600000) / 60000);
-  return h > 0 ? `${h}小时${m > 0 ? m+'分钟' : ''}` : `${m}分钟`;
+  if (ms <= 0) return '0分钟'
+  const h = Math.floor(ms / 3600000)
+  const m = Math.floor((ms % 3600000) / 60000)
+  return h > 0 ? `${h}小时${m > 0 ? m+'分钟' : ''}` : `${m}分钟`
 }
 
 function esc(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
 }
 
-let toastTimer;
+function showLoading(on) {
+  document.getElementById('loading').classList.toggle('show', on)
+}
+
+let toastTimer
 function showToast(msg, isErr=false) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = 'toast show' + (isErr ? ' error' : '');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+  const el = document.getElementById('toast')
+  el.textContent = msg
+  el.className = 'toast show' + (isErr ? ' error' : '')
+  clearTimeout(toastTimer)
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2500)
 }
 
-init();
+init()
 </script>
 </body>
 </html>
