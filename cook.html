@@ -23,15 +23,11 @@
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Noto Serif SC', serif;
-  min-height: 100vh;
-  overflow-x: hidden;
+  background: var(--bg); color: var(--text);
+  font-family: 'Noto Serif SC', serif; min-height: 100vh; overflow-x: hidden;
 }
 body::before {
-  content: '';
-  position: fixed; inset: 0;
+  content: ''; position: fixed; inset: 0;
   background:
     radial-gradient(ellipse 60% 40% at 20% 10%, rgba(180,80,20,.12) 0%, transparent 70%),
     radial-gradient(ellipse 40% 60% at 80% 80%, rgba(120,60,20,.08) 0%, transparent 70%),
@@ -40,7 +36,6 @@ body::before {
 }
 .wrap { position: relative; z-index: 1; max-width: 780px; margin: 0 auto; padding: 0 16px 80px; }
 
-/* ── Header ── */
 header {
   text-align: center; padding: 56px 20px 36px;
   border-bottom: 1px solid var(--border); margin-bottom: 28px; position: relative;
@@ -50,135 +45,69 @@ header::after {
   width: 120px; height: 2px;
   background: linear-gradient(90deg, transparent, var(--orange), transparent);
 }
-.header-icon {
-  font-size: 56px; display: block; margin-bottom: 14px;
-  filter: drop-shadow(0 0 18px rgba(220,120,40,.6));
-  animation: float 4s ease-in-out infinite;
-}
+.header-icon { font-size: 56px; display: block; margin-bottom: 14px; filter: drop-shadow(0 0 18px rgba(220,120,40,.6)); animation: float 4s ease-in-out infinite; }
 @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-h1 {
-  font-family: 'Cinzel', serif;
-  font-size: clamp(22px, 5vw, 34px);
-  color: var(--orange-glow);
-  letter-spacing: 6px;
-  text-shadow: 0 0 30px rgba(220,120,40,.4);
-  margin-bottom: 8px;
-}
+h1 { font-family: 'Cinzel', serif; font-size: clamp(22px, 5vw, 34px); color: var(--orange-glow); letter-spacing: 6px; text-shadow: 0 0 30px rgba(220,120,40,.4); margin-bottom: 8px; }
 .header-sub { font-size: 13px; color: var(--text-dim); letter-spacing: 2px; }
 
-/* ── 操作栏 ── */
 .action-bar {
-  position: sticky; top: 0;
-  background: rgba(16,8,0,.92); backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
-  padding: 14px 16px 0; margin: 0 -16px 24px; z-index: 100;
+  position: sticky; top: 0; background: rgba(16,8,0,.92); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border); padding: 14px 16px 0; margin: 0 -16px 24px; z-index: 100;
 }
 .search-row { display: flex; gap: 10px; margin-bottom: 12px; }
-.search-box {
-  flex: 1; display: flex; align-items: center;
-  background: var(--bg3); border: 1px solid var(--border2);
-  border-radius: 40px; padding: 0 16px; height: 42px; gap: 8px;
-}
-.search-box input {
-  flex: 1; background: none; border: none; outline: none;
-  color: var(--text); font-family: inherit; font-size: 14px;
-}
+.search-box { flex: 1; display: flex; align-items: center; background: var(--bg3); border: 1px solid var(--border2); border-radius: 40px; padding: 0 16px; height: 42px; gap: 8px; }
+.search-box input { flex: 1; background: none; border: none; outline: none; color: var(--text); font-family: inherit; font-size: 14px; }
 .search-box input::placeholder { color: var(--text-dim); }
-.clear-btn { color: var(--text-dim); cursor: pointer; font-size: 13px; padding: 2px 4px; }
-.clear-btn:hover { color: var(--text); }
-.publish-btn {
-  background: linear-gradient(135deg, var(--orange-dim), var(--orange));
-  color: #fff; border: none; border-radius: 40px; padding: 0 22px; height: 42px;
-  font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap;
-  font-family: 'Noto Serif SC', serif;
-  box-shadow: 0 4px 16px rgba(180,80,20,.35);
-  transition: transform .15s, box-shadow .15s;
-}
-.publish-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(180,80,20,.45); }
+.clear-btn { color: var(--text-dim); cursor: pointer; font-size: 13px; }
+.publish-btn { background: linear-gradient(135deg, var(--orange-dim), var(--orange)); color: #fff; border: none; border-radius: 40px; padding: 0 22px; height: 42px; font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; font-family: 'Noto Serif SC', serif; box-shadow: 0 4px 16px rgba(180,80,20,.35); transition: transform .15s; }
+.publish-btn:hover { transform: translateY(-1px); }
 
 .filter-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 14px; scrollbar-width: none; }
 .filter-scroll::-webkit-scrollbar { display: none; }
-.filter-tag {
-  white-space: nowrap; padding: 6px 18px; border-radius: 24px;
-  font-size: 13px; color: var(--text-dim); background: var(--bg3);
-  border: 1px solid var(--border); cursor: pointer; transition: all .15s;
-  font-family: 'Noto Serif SC', serif;
-}
-.filter-tag:hover { border-color: var(--border2); color: var(--text); }
+.filter-tag { white-space: nowrap; padding: 6px 18px; border-radius: 24px; font-size: 13px; color: var(--text-dim); background: var(--bg3); border: 1px solid var(--border); cursor: pointer; transition: all .15s; font-family: 'Noto Serif SC', serif; }
 .filter-tag.active { background: var(--orange-dim); color: #fde8c8; border-color: var(--orange); font-weight: 600; }
 
-/* ── 统计 ── */
 .stats-bar { display: flex; gap: 16px; margin-bottom: 20px; font-size: 13px; color: var(--text-dim); }
 .stats-bar span { color: var(--orange-glow); font-weight: 600; }
 
-/* ── 身份栏 ── */
-.identity-bar {
-  background: rgba(26,15,8,.8); border: 1px solid var(--border);
-  border-radius: 10px; padding: 10px 16px; margin-bottom: 20px;
-  display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-dim);
-}
+.identity-bar { background: rgba(26,15,8,.8); border: 1px solid var(--border); border-radius: 10px; padding: 10px 16px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-dim); }
 .identity-bar .id-val { color: var(--orange-glow); font-weight: 600; }
 .identity-bar .change-id { margin-left: auto; cursor: pointer; color: var(--text-dim); text-decoration: underline; font-size: 12px; }
-.identity-bar .change-id:hover { color: var(--text); }
 
-/* ── 帖子列表 ── */
 .post-list { display: flex; flex-direction: column; gap: 16px; }
 .empty-state { text-align: center; padding: 80px 0; color: var(--text-dim); }
 .empty-state .ei { font-size: 60px; opacity: .35; display: block; margin-bottom: 16px; }
-.empty-state p { font-size: 15px; }
 
-/* ── 卡片 ── */
 .post-card {
-  background: var(--card-bg); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 22px; position: relative;
-  overflow: hidden; cursor: pointer;
+  background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 22px; position: relative; overflow: hidden; cursor: pointer;
   transition: border-color .2s, transform .15s, box-shadow .2s;
   animation: fadeUp .3s ease both;
 }
 @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
-.post-card::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(200,100,30,.4), transparent);
-}
+.post-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(200,100,30,.4), transparent); }
 .post-card:hover { border-color: var(--border2); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,.4); }
 
-/* 分类色带 */
-.post-card.cat-meat    { border-left: 3px solid #d06050; }
-.post-card.cat-veggie  { border-left: 3px solid #60c050; }
-.post-card.cat-soup    { border-left: 3px solid #5090d0; }
-.post-card.cat-dessert { border-left: 3px solid #d080a0; }
-.post-card.cat-special { border-left: 3px solid var(--gold); }
+/* 稀有度色带 */
+.post-card.rarity-common { border-left: 3px solid #7a7a7a; }
+.post-card.rarity-rare   { border-left: 3px solid #5090d0; }
+.post-card.rarity-epic   { border-left: 3px solid #9060d0; }
+.post-card.rarity-legend { border-left: 3px solid var(--gold); }
 
-.cat-badge {
-  position: absolute; top: 16px; right: 16px;
-  font-size: 11px; padding: 3px 12px; border-radius: 16px; font-weight: 600;
-}
-.cat-badge.meat    { background: #3a1010; color: #f07060; border: 1px solid #7a2818; }
-.cat-badge.veggie  { background: #1a3010; color: #80c860; border: 1px solid #3a6018; }
-.cat-badge.soup    { background: #101a3a; color: #70a8f0; border: 1px solid #2a4888; }
-.cat-badge.dessert { background: #3a1830; color: #f0a0c0; border: 1px solid #882850; }
-.cat-badge.special { background: #3a2808; color: #f0c860; border: 1px solid #886018; }
+.rarity-badge { position: absolute; top: 16px; right: 16px; font-size: 11px; padding: 3px 12px; border-radius: 16px; font-weight: 600; }
+.rarity-badge.common { background: #2a2a2a; color: #c0c0c0; border: 1px solid #5a5a5a; }
+.rarity-badge.rare   { background: #101a3a; color: #70a8f0; border: 1px solid #2a4888; }
+.rarity-badge.epic   { background: #1e1040; color: #b080f0; border: 1px solid #5030a0; }
+.rarity-badge.legend { background: #3a2808; color: #f0c060; border: 1px solid #886018; }
 
 .card-header { display: flex; align-items: center; gap: 16px; margin-bottom: 14px; padding-right: 80px; }
-.dish-avatar {
-  width: 52px; height: 52px; border-radius: 50%;
-  background: #2a1808; border: 1px solid #6a3010;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 26px; flex-shrink: 0;
-}
+.dish-avatar { width: 52px; height: 52px; border-radius: 50%; background: #2a1808; border: 1px solid #6a3010; display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; }
 .card-meta { flex: 1; }
 .dish-name { font-size: 18px; font-weight: 600; color: #f0c090; display: block; margin-bottom: 3px; }
 .player-id { font-size: 12px; color: var(--text-dim); }
-.qty-badge {
-  font-size: 16px; font-weight: 700; color: var(--orange-glow);
-  background: #2a1808; border: 1px solid #7a4010;
-  border-radius: 8px; padding: 3px 12px;
-}
-.card-note {
-  margin-bottom: 12px; padding: 8px 12px;
-  background: #1e1208; border-left: 2px solid var(--border2);
-  border-radius: 0 8px 8px 0; font-size: 12px; color: #9a6040; line-height: 1.6;
-}
+.qty-badge { font-size: 16px; font-weight: 700; color: var(--orange-glow); background: #2a1808; border: 1px solid #7a4010; border-radius: 8px; padding: 3px 12px; }
+
+.card-note { margin-bottom: 12px; padding: 8px 12px; background: #1e1208; border-left: 2px solid var(--border2); border-radius: 0 8px 8px 0; font-size: 12px; color: #9a6040; line-height: 1.6; }
 .card-times { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; font-size: 12px; }
 .time-row { display: flex; justify-content: space-between; align-items: center; }
 .time-label { color: var(--text-dim); }
@@ -192,82 +121,37 @@ h1 {
 .status-badge.ready    { background: #1a2a10; color: #70c860; }
 .status-badge.expiring { background: #3a1808; color: #f08040; }
 .countdown { font-size: 12px; color: var(--text-dim); font-family: monospace; }
-.delete-btn {
-  position: absolute; bottom: 16px; right: 16px;
-  background: rgba(200,50,50,.15); border: 1px solid rgba(200,50,50,.3);
-  color: #d87070; border-radius: 8px; padding: 4px 10px;
-  font-size: 11px; cursor: pointer; font-family: 'Noto Serif SC', serif;
-  transition: background .15s;
-}
+.delete-btn { position: absolute; bottom: 16px; right: 16px; background: rgba(200,50,50,.15); border: 1px solid rgba(200,50,50,.3); color: #d87070; border-radius: 8px; padding: 4px 10px; font-size: 11px; cursor: pointer; font-family: 'Noto Serif SC', serif; transition: background .15s; }
 .delete-btn:hover { background: rgba(200,50,50,.3); }
 
-/* ── 弹窗 ── */
-.modal-mask {
-  display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,.8); z-index: 1000;
-  align-items: flex-end; justify-content: center; backdrop-filter: blur(4px);
-}
+.modal-mask { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.8); z-index: 1000; align-items: flex-end; justify-content: center; backdrop-filter: blur(4px); }
 .modal-mask.open { display: flex; }
-.modal-box {
-  width: 100%; max-width: 780px; max-height: 92vh;
-  background: #160e08; border-radius: 24px 24px 0 0;
-  border-top: 2px solid var(--border2);
-  display: flex; flex-direction: column;
-  animation: slideUp .25s ease;
-}
+.modal-box { width: 100%; max-width: 780px; max-height: 92vh; background: #160e08; border-radius: 24px 24px 0 0; border-top: 2px solid var(--border2); display: flex; flex-direction: column; animation: slideUp .25s ease; }
 @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
-.modal-header {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 24px 24px 16px; border-bottom: 1px solid var(--border);
-}
+.modal-header { display: flex; justify-content: space-between; align-items: center; padding: 24px 24px 16px; border-bottom: 1px solid var(--border); }
 .modal-title { font-size: 20px; font-weight: 600; color: var(--orange-glow); font-family: 'Cinzel', serif; }
 .modal-close { color: var(--text-dim); cursor: pointer; font-size: 20px; padding: 4px 8px; }
-.modal-close:hover { color: var(--text); }
-.modal-body {
-  flex: 1; overflow-y: auto; padding: 20px 24px;
-  scrollbar-width: thin; scrollbar-color: var(--border2) transparent;
-}
+.modal-body { flex: 1; overflow-y: auto; padding: 20px 24px; scrollbar-width: thin; scrollbar-color: var(--border2) transparent; }
 .form-group { margin-bottom: 24px; }
 .form-label { display: block; font-size: 13px; color: var(--orange-glow); margin-bottom: 8px; font-weight: 600; letter-spacing: 1px; }
-.form-input, .form-textarea {
-  width: 100%; background: var(--bg3); border: 1px solid var(--border2);
-  border-radius: 10px; padding: 11px 16px; font-size: 14px;
-  color: var(--text); font-family: 'Noto Serif SC', serif; outline: none; transition: border-color .15s;
-}
+.form-input, .form-textarea { width: 100%; background: var(--bg3); border: 1px solid var(--border2); border-radius: 10px; padding: 11px 16px; font-size: 14px; color: var(--text); font-family: 'Noto Serif SC', serif; outline: none; transition: border-color .15s; }
 .form-input:focus, .form-textarea:focus { border-color: var(--orange); }
 .form-input::placeholder, .form-textarea::placeholder { color: var(--text-dim); }
 .form-textarea { min-height: 80px; resize: vertical; }
 .picker-row { display: flex; gap: 10px; }
 .picker-row .form-input { flex: 1; color-scheme: dark; }
-.cat-picker { display: flex; gap: 8px; flex-wrap: wrap; }
-.cat-opt {
-  padding: 8px 18px; border-radius: 24px; font-size: 13px;
-  border: 1px solid var(--border); color: var(--text-dim);
-  background: var(--bg3); cursor: pointer; transition: all .15s;
-  font-family: 'Noto Serif SC', serif;
-}
-.cat-opt.sel-meat    { background: #3a1010; border-color: #f07060; color: #f5c0b0; }
-.cat-opt.sel-veggie  { background: #1a3010; border-color: #80c860; color: #b0e890; }
-.cat-opt.sel-soup    { background: #101a3a; border-color: #70a8f0; color: #a0c8f8; }
-.cat-opt.sel-dessert { background: #3a1830; border-color: #f0a0c0; color: #f8c8d8; }
-.cat-opt.sel-special { background: #3a2808; border-color: #f0c860; color: #f8e090; }
-.modal-footer { display: flex; gap: 12px; padding: 16px 24px; border-top: 1px solid var(--border); }
-.btn-cancel {
-  flex: 1; padding: 13px; text-align: center; border-radius: 10px;
-  background: var(--bg3); border: 1px solid var(--border2); color: var(--text-dim);
-  cursor: pointer; font-family: 'Noto Serif SC', serif; font-size: 14px; transition: background .15s;
-}
-.btn-cancel:hover { background: #2a1808; }
-.btn-submit {
-  flex: 2; padding: 13px; text-align: center; border-radius: 10px;
-  background: linear-gradient(135deg, var(--orange-dim), var(--orange));
-  color: #fff; font-weight: 700; cursor: pointer;
-  font-family: 'Noto Serif SC', serif; font-size: 14px; border: none;
-  box-shadow: 0 4px 16px rgba(180,80,20,.4); transition: opacity .15s;
-}
-.btn-submit:hover { opacity: .9; }
 
-/* ── 详情弹窗 ── */
+.rarity-picker { display: flex; gap: 8px; flex-wrap: wrap; }
+.rarity-opt { padding: 8px 18px; border-radius: 24px; font-size: 13px; border: 1px solid var(--border); color: var(--text-dim); background: var(--bg3); cursor: pointer; transition: all .15s; font-family: 'Noto Serif SC', serif; }
+.rarity-opt.sel-common { background: #2a2a2a; border-color: #c0c0c0; color: #e0e0e0; }
+.rarity-opt.sel-rare   { background: #101a3a; border-color: #70a8f0; color: #a0c8f8; }
+.rarity-opt.sel-epic   { background: #1e1040; border-color: #b080f0; color: #d0a8f8; }
+.rarity-opt.sel-legend { background: #3a2808; border-color: #f0c060; color: #f8e090; }
+
+.modal-footer { display: flex; gap: 12px; padding: 16px 24px; border-top: 1px solid var(--border); }
+.btn-cancel { flex: 1; padding: 13px; text-align: center; border-radius: 10px; background: var(--bg3); border: 1px solid var(--border2); color: var(--text-dim); cursor: pointer; font-family: 'Noto Serif SC', serif; font-size: 14px; }
+.btn-submit { flex: 2; padding: 13px; text-align: center; border-radius: 10px; background: linear-gradient(135deg, var(--orange-dim), var(--orange)); color: #fff; font-weight: 700; cursor: pointer; font-family: 'Noto Serif SC', serif; font-size: 14px; border: none; box-shadow: 0 4px 16px rgba(180,80,20,.4); }
+
 .detail-modal .modal-box { border-radius: 24px; margin: 20px; max-height: 80vh; align-self: center; }
 .detail-body { padding: 24px; }
 .detail-dish-name { font-size: 24px; font-weight: 700; color: #f0c090; margin-bottom: 6px; }
@@ -277,31 +161,13 @@ h1 {
 .detail-val { color: var(--text); font-weight: 500; }
 .detail-note-box { margin-top: 14px; padding: 14px; background: rgba(255,255,255,.03); border-radius: 10px; font-size: 13px; line-height: 1.7; color: var(--text-dim); border-left: 2px solid var(--border2); }
 
-/* ── Toast & Loading ── */
-.toast {
-  position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
-  background: #2a1808; color: var(--orange-glow); border: 1px solid var(--border2);
-  border-radius: 24px; padding: 10px 24px; font-size: 14px;
-  opacity: 0; transition: opacity .25s, transform .25s; z-index: 9999;
-  pointer-events: none; white-space: nowrap;
-}
+.toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); background: #2a1808; color: var(--orange-glow); border: 1px solid var(--border2); border-radius: 24px; padding: 10px 24px; font-size: 14px; opacity: 0; transition: opacity .25s, transform .25s; z-index: 9999; pointer-events: none; white-space: nowrap; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 .toast.error { background: #3a1010; color: #f08080; border-color: #6a2828; }
-.loading-overlay {
-  display: none; position: fixed; inset: 0; background: rgba(16,8,0,.7);
-  z-index: 500; align-items: center; justify-content: center;
-  flex-direction: column; gap: 16px; color: var(--orange-glow); font-size: 15px;
-}
+.loading-overlay { display: none; position: fixed; inset: 0; background: rgba(16,8,0,.7); z-index: 500; align-items: center; justify-content: center; flex-direction: column; gap: 16px; color: var(--orange-glow); font-size: 15px; }
 .loading-overlay.show { display: flex; }
 .spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--orange); border-radius: 50%; animation: spin .8s linear infinite; }
 @keyframes spin { to{transform:rotate(360deg)} }
-
-@media (max-width: 480px) {
-  header { padding: 40px 16px 28px; }
-  .post-card { padding: 18px; }
-  .card-header { gap: 12px; }
-  .dish-avatar { width: 44px; height: 44px; font-size: 22px; }
-}
 </style>
 </head>
 <body>
@@ -330,13 +196,8 @@ h1 {
     <span class="change-id" onclick="changeId()">更改</span>
   </div>
 
-  <div class="stats-bar">
-    共 <span id="statTotal">0</span> 条发布 · 显示 <span id="statShown">0</span> 条
-  </div>
-
-  <div class="post-list" id="postList">
-    <div class="empty-state"><span class="ei">🥘</span><p>正在加载菜品信息…</p></div>
-  </div>
+  <div class="stats-bar">共 <span id="statTotal">0</span> 条发布 · 显示 <span id="statShown">0</span> 条</div>
+  <div class="post-list" id="postList"><div class="empty-state"><span class="ei">🥘</span><p>正在加载…</p></div></div>
 </div>
 
 <!-- 发布弹窗 -->
@@ -374,13 +235,12 @@ h1 {
         </div>
       </div>
       <div class="form-group">
-        <label class="form-label">菜品分类</label>
-        <div class="cat-picker" id="catPicker">
-          <span class="cat-opt sel-meat"    data-c="meat"    onclick="setCat(this)">🥩 肉类</span>
-          <span class="cat-opt"             data-c="veggie"  onclick="setCat(this)">🥦 素食</span>
-          <span class="cat-opt"             data-c="soup"    onclick="setCat(this)">🍜 汤品</span>
-          <span class="cat-opt"             data-c="dessert" onclick="setCat(this)">🍰 甜点</span>
-          <span class="cat-opt"             data-c="special" onclick="setCat(this)">⭐ 特殊</span>
+        <label class="form-label">稀有度</label>
+        <div class="rarity-picker" id="rarityPicker">
+          <span class="rarity-opt sel-common" data-r="common" onclick="setRarity(this)">⚪ 普通</span>
+          <span class="rarity-opt" data-r="rare"   onclick="setRarity(this)">🔵 稀有</span>
+          <span class="rarity-opt" data-r="epic"   onclick="setRarity(this)">🟣 史诗</span>
+          <span class="rarity-opt" data-r="legend" onclick="setRarity(this)">🟡 传说</span>
         </div>
       </div>
       <div class="form-group">
@@ -421,17 +281,14 @@ const FILTERS = [
   { id:'ready',    label:'✅ 已完成' },
   { id:'cooking',  label:'🍳 烹饪中' },
   { id:'expiring', label:'⏰ 快取走' },
-  { id:'meat',     label:'🥩 肉类' },
-  { id:'veggie',   label:'🥦 素食' },
-  { id:'soup',     label:'🍜 汤品' },
-  { id:'dessert',  label:'🍰 甜点' },
-  { id:'special',  label:'⭐ 特殊' },
+  { id:'common',   label:'⚪ 普通' },
+  { id:'rare',     label:'🔵 稀有' },
+  { id:'epic',     label:'🟣 史诗' },
+  { id:'legend',   label:'🟡 传说' },
 ]
-const CAT_LABELS = { meat:'肉类', veggie:'素食', soup:'汤品', dessert:'甜点', special:'特殊' }
+const RARITY_LABELS = { common:'普通', rare:'稀有', epic:'史诗', legend:'传说' }
 const DISH_ICONS = {
   default:'🍲',
-  '红烧肉':'🥩','炖鸡':'🍗','烤鱼':'🐟','蒸饺':'🥟','素炒':'🥦',
-  '汤圆':'🍡','米饭':'🍚','面条':'🍜','蛋糕':'🎂','布丁':'🍮','饼干':'🍪',
   '海鱼黄金焗饭':'🍛','奶油蘑菇炖饭':'🍄','果香烤乳猪':'🐷','幽兰秘制肉卷':'🥩',
   '海盐烤虾':'🦐','红酒鹿肉炖汤':'🍷','甜奶油蛋派':'🥧','香草战斧牛排':'🥩',
   '香草风味烤扇贝':'🐚','浓香烤全鸡':'🍗','奶油蟹粉面':'🦀','墨汁海鲜意面':'🦑',
@@ -440,146 +297,101 @@ const DISH_ICONS = {
   '招财进宝汤饺':'🥟','年年有鱼':'🐟','神秘圣诞姜饼人':'🍪',
 }
 
-let allPosts = [], filteredPosts = []
-let activeFilter = 'all', searchKw = '', selectedCat = 'meat'
-let myOwnerId = '', refreshTimer = null
+let allPosts=[], filteredPosts=[], activeFilter='all', searchKw='', selectedRarity='common', myOwnerId=''
 
 async function init() {
   myOwnerId = localStorage.getItem(OWNER_KEY) || ''
-  if (!myOwnerId) {
-    myOwnerId = 'user_' + Math.random().toString(36).slice(2,10)
-    localStorage.setItem(OWNER_KEY, myOwnerId)
-  }
+  if (!myOwnerId) { myOwnerId = 'user_'+Math.random().toString(36).slice(2,10); localStorage.setItem(OWNER_KEY, myOwnerId) }
   document.getElementById('myIdDisplay').textContent = myOwnerId
   const today = new Date().toISOString().split('T')[0]
   document.getElementById('fMatureDate').value = today
   document.getElementById('fExpireDate').value = today
   buildFilters()
   await loadPosts()
-  sb.channel('cook_posts_changes')
-    .on('postgres_changes', { event:'*', schema:'public', table:'cook_posts' }, () => loadPosts())
-    .subscribe()
-  refreshTimer = setInterval(() => recomputeStatus(), 60000)
+  sb.channel('cook_posts_changes').on('postgres_changes',{event:'*',schema:'public',table:'cook_posts'},()=>loadPosts()).subscribe()
+  setInterval(()=>recomputeStatus(), 60000)
 }
 
 function changeId() {
-  const newId = prompt('输入新的游戏ID:', myOwnerId)
-  if (newId && newId.trim()) {
-    myOwnerId = newId.trim()
-    localStorage.setItem(OWNER_KEY, myOwnerId)
-    document.getElementById('myIdDisplay').textContent = myOwnerId
-    showToast('身份已更新')
-  }
+  const n = prompt('输入新的游戏ID:', myOwnerId)
+  if (n&&n.trim()) { myOwnerId=n.trim(); localStorage.setItem(OWNER_KEY,myOwnerId); document.getElementById('myIdDisplay').textContent=myOwnerId; showToast('身份已更新') }
 }
 
 function buildFilters() {
-  document.getElementById('filterScroll').innerHTML = FILTERS.map(f =>
+  document.getElementById('filterScroll').innerHTML = FILTERS.map(f=>
     `<span class="filter-tag ${f.id==='all'?'active':''}" data-id="${f.id}" onclick="setFilter(this)">${f.label}</span>`
   ).join('')
 }
-
 function setFilter(el) {
-  document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'))
-  el.classList.add('active')
-  activeFilter = el.dataset.id
-  applyFilter()
+  document.querySelectorAll('.filter-tag').forEach(t=>t.classList.remove('active'))
+  el.classList.add('active'); activeFilter=el.dataset.id; applyFilter()
 }
 
 async function loadPosts() {
   showLoading(true)
   try {
     const now = Date.now()
-    await sb.from('cook_posts').delete().eq('owner_id', myOwnerId).lt('expire_time', now)
-    const { data, error } = await sb.from('cook_posts')
-      .select('*').gt('expire_time', now).order('expire_time', { ascending: true }).limit(200)
+    await sb.from('cook_posts').delete().eq('owner_id',myOwnerId).lt('expire_time',now)
+    const {data,error} = await sb.from('cook_posts').select('*').gt('expire_time',now).order('expire_time',{ascending:true}).limit(200)
     if (error) throw error
-    allPosts = (data || []).map(p => processPost(p, now))
+    allPosts = (data||[]).map(p=>processPost(p,now))
     applyFilter()
-  } catch(e) {
-    console.error(e)
-    showToast('加载失败，请刷新重试', true)
-  } finally {
-    showLoading(false)
-  }
+  } catch(e) { showToast('加载失败，请刷新重试',true) }
+  finally { showLoading(false) }
 }
 
 function processPost(p, now) {
-  const matureTime = p.mature_time, expireTime = p.expire_time
-  const dishName = p.dish_name, playerId = p.player_id, ownerId = p.owner_id
-  const isMature = now >= matureTime
-  const timeLeft = expireTime - now
-  const totalSpan = expireTime - matureTime
-  const elapsed = now - matureTime
-  const progressPct = (isMature && totalSpan > 0) ? Math.min(100, Math.round(elapsed/totalSpan*100)) : 0
-  const expireSoon = timeLeft < 2*3600*1000
-  let status, statusLabel
-  if (!isMature)       { status='cooking';  statusLabel='🍳 烹饪中' }
-  else if (expireSoon) { status='expiring'; statusLabel='⚠️ 快取走' }
-  else                 { status='ready';    statusLabel='✅ 已完成' }
-  const countdownStr = !isMature ? `还需 ${fmtDur(matureTime-now)} 完成` : `${fmtDur(timeLeft)} 后取走`
+  const matureTime=p.mature_time, expireTime=p.expire_time
+  const dishName=p.dish_name, playerId=p.player_id, ownerId=p.owner_id
+  const isMature=now>=matureTime, timeLeft=expireTime-now
+  const totalSpan=expireTime-matureTime, elapsed=now-matureTime
+  const progressPct=(isMature&&totalSpan>0)?Math.min(100,Math.round(elapsed/totalSpan*100)):0
+  const expireSoon=timeLeft<2*3600*1000
+  let status,statusLabel
+  if (!isMature){status='cooking';statusLabel='🍳 烹饪中'}
+  else if (expireSoon){status='expiring';statusLabel='⚠️ 快取走'}
+  else{status='ready';statusLabel='✅ 已完成'}
+  const countdownStr=!isMature?`还需 ${fmtDur(matureTime-now)} 完成`:`${fmtDur(timeLeft)} 后取走`
   return {
-    id: p.id, dishName, quantity: p.quantity, playerId, ownerId,
-    matureTime, expireTime, category: p.category || 'meat', note: p.note || '',
+    id:p.id, dishName, quantity:p.quantity, playerId, ownerId,
+    matureTime, expireTime, rarity:p.rarity||'common', note:p.note||'',
     status, statusLabel, countdownStr, progressPct, expireSoon,
-    matureStr: fmtDt(matureTime), expireStr: fmtDt(expireTime),
-    catLabel: CAT_LABELS[p.category] || '肉类',
-    icon: DISH_ICONS[dishName] || DISH_ICONS.default,
-    isOwn: ownerId === myOwnerId,
+    matureStr:fmtDt(matureTime), expireStr:fmtDt(expireTime),
+    rarityLabel:RARITY_LABELS[p.rarity]||'普通',
+    icon:DISH_ICONS[dishName]||DISH_ICONS.default,
+    isOwn:ownerId===myOwnerId,
   }
 }
 
 function recomputeStatus() {
-  const now = Date.now()
-  allPosts = allPosts.filter(p => p.expireTime > now).map(p => processPost(p, now))
+  const now=Date.now()
+  allPosts=allPosts.filter(p=>p.expireTime>now).map(p=>processPost(p,now))
   applyFilter()
 }
 
-function onSearch() {
-  searchKw = document.getElementById('searchInput').value
-  document.getElementById('clearBtn').style.display = searchKw ? 'block' : 'none'
-  applyFilter()
-}
-function clearSearch() {
-  document.getElementById('searchInput').value = ''
-  searchKw = ''
-  document.getElementById('clearBtn').style.display = 'none'
-  applyFilter()
-}
+function onSearch() { searchKw=document.getElementById('searchInput').value; document.getElementById('clearBtn').style.display=searchKw?'block':'none'; applyFilter() }
+function clearSearch() { document.getElementById('searchInput').value=''; searchKw=''; document.getElementById('clearBtn').style.display='none'; applyFilter() }
 
 function applyFilter() {
-  let list = [...allPosts]
-  if (searchKw.trim()) {
-    const kw = searchKw.trim().toLowerCase()
-    list = list.filter(p =>
-      p.dishName.toLowerCase().includes(kw) ||
-      p.playerId.toLowerCase().includes(kw) ||
-      (p.note||'').toLowerCase().includes(kw)
-    )
+  let list=[...allPosts]
+  if (searchKw.trim()) { const kw=searchKw.trim().toLowerCase(); list=list.filter(p=>p.dishName.toLowerCase().includes(kw)||p.playerId.toLowerCase().includes(kw)||(p.note||'').toLowerCase().includes(kw)) }
+  if (activeFilter!=='all') {
+    if (['cooking','ready','expiring'].includes(activeFilter)) list=list.filter(p=>p.status===activeFilter)
+    else list=list.filter(p=>p.rarity===activeFilter)
   }
-  if (activeFilter !== 'all') {
-    if (['cooking','ready','expiring'].includes(activeFilter)) list = list.filter(p => p.status === activeFilter)
-    else list = list.filter(p => p.category === activeFilter)
-  }
-  list.sort((a,b) => {
-    if (a.status==='ready' && b.status!=='ready') return -1
-    if (b.status==='ready' && a.status!=='ready') return 1
-    return a.expireTime - b.expireTime
-  })
-  filteredPosts = list
-  document.getElementById('statTotal').textContent = allPosts.length
-  document.getElementById('statShown').textContent = list.length
+  list.sort((a,b)=>{ if(a.status==='ready'&&b.status!=='ready')return -1; if(b.status==='ready'&&a.status!=='ready')return 1; return a.expireTime-b.expireTime })
+  filteredPosts=list
+  document.getElementById('statTotal').textContent=allPosts.length
+  document.getElementById('statShown').textContent=list.length
   renderList()
 }
 
 function renderList() {
-  const el = document.getElementById('postList')
-  if (!filteredPosts.length) {
-    el.innerHTML = `<div class="empty-state"><span class="ei">🥘</span><p>暂无相关菜品帖子</p></div>`
-    return
-  }
-  el.innerHTML = filteredPosts.map((p,i) => `
-    <div class="post-card cat-${p.category}" style="animation-delay:${i*40}ms" onclick="openDetail('${p.id}')">
-      <span class="cat-badge ${p.category}">${p.catLabel}</span>
+  const el=document.getElementById('postList')
+  if (!filteredPosts.length){el.innerHTML=`<div class="empty-state"><span class="ei">🥘</span><p>暂无相关菜品帖子</p></div>`;return}
+  el.innerHTML=filteredPosts.map((p,i)=>`
+    <div class="post-card rarity-${p.rarity}" style="animation-delay:${i*40}ms" onclick="openDetail('${p.id}')">
+      <span class="rarity-badge ${p.rarity}">${p.rarityLabel}</span>
       <div class="card-header">
         <div class="dish-avatar">${p.icon}</div>
         <div class="card-meta">
@@ -588,7 +400,7 @@ function renderList() {
         </div>
         <span class="qty-badge">×${p.quantity}</span>
       </div>
-      ${p.note ? `<div class="card-note">💬 ${esc(p.note)}</div>` : ''}
+      ${p.note?`<div class="card-note">💬 ${esc(p.note)}</div>`:''}
       <div class="card-times">
         <div class="time-row"><span class="time-label">🍳 完成时间</span><span class="time-val">${p.matureStr}</span></div>
         <div class="time-row"><span class="time-label">⏳ 取走截止</span><span class="time-val ${p.expireSoon?'soon':''}">${p.expireStr}</span></div>
@@ -598,126 +410,89 @@ function renderList() {
         <span class="status-badge ${p.status}">${p.statusLabel}</span>
         <span class="countdown">${p.countdownStr}</span>
       </div>
-      ${p.isOwn ? `<span class="delete-btn" onclick="deletePost(event,'${p.id}')">删除</span>` : ''}
+      ${p.isOwn?`<span class="delete-btn" onclick="deletePost(event,'${p.id}')">删除</span>`:''}
     </div>
   `).join('')
 }
 
 function openPublish() {
-  if (myOwnerId && !myOwnerId.startsWith('user_')) document.getElementById('fPlayerId').value = myOwnerId
-  else document.getElementById('fPlayerId').value = ''
+  if (myOwnerId&&!myOwnerId.startsWith('user_')) document.getElementById('fPlayerId').value=myOwnerId
+  else document.getElementById('fPlayerId').value=''
   document.getElementById('publishModal').classList.add('open')
 }
 function closePublish() { document.getElementById('publishModal').classList.remove('open') }
 
-function setCat(el) {
-  document.querySelectorAll('#catPicker .cat-opt').forEach(o => o.className = 'cat-opt')
-  el.className = `cat-opt sel-${el.dataset.c}`
-  selectedCat = el.dataset.c
+function setRarity(el) {
+  document.querySelectorAll('#rarityPicker .rarity-opt').forEach(o=>o.className='rarity-opt')
+  el.className=`rarity-opt sel-${el.dataset.r}`; selectedRarity=el.dataset.r
 }
 
 async function submitPost() {
-  const dishName = document.getElementById('fDishName').value.trim()
-  const qty      = document.getElementById('fQty').value.trim()
-  const playerId = document.getElementById('fPlayerId').value.trim()
-  const md = document.getElementById('fMatureDate').value
-  const mt = document.getElementById('fMatureTime').value
-  const ed = document.getElementById('fExpireDate').value
-  const et = document.getElementById('fExpireTime').value
-  const note = document.getElementById('fNote').value.trim()
-  if (!dishName) return showToast('请填写菜品名称', true)
-  if (!qty || isNaN(+qty) || +qty < 1) return showToast('请填写正确的数量', true)
-  if (!playerId) return showToast('请填写游戏ID', true)
-  if (!md || !mt) return showToast('请填写完成时间', true)
-  if (!ed || !et) return showToast('请填写取走截止时间', true)
-  const matureTs = new Date(`${md}T${mt}`).getTime()
-  const expireTs = new Date(`${ed}T${et}`).getTime()
-  if (isNaN(matureTs)) return showToast('完成时间格式有误', true)
-  if (isNaN(expireTs)) return showToast('取走截止时间格式有误', true)
-  if (expireTs <= matureTs) return showToast('取走截止须晚于完成时间', true)
-  if (expireTs <= Date.now()) return showToast('取走截止时间已过期', true)
-  myOwnerId = playerId
-  localStorage.setItem(OWNER_KEY, myOwnerId)
-  document.getElementById('myIdDisplay').textContent = myOwnerId
+  const dishName=document.getElementById('fDishName').value.trim()
+  const qty=document.getElementById('fQty').value.trim()
+  const playerId=document.getElementById('fPlayerId').value.trim()
+  const md=document.getElementById('fMatureDate').value, mt=document.getElementById('fMatureTime').value
+  const ed=document.getElementById('fExpireDate').value, et=document.getElementById('fExpireTime').value
+  const note=document.getElementById('fNote').value.trim()
+  if (!dishName) return showToast('请填写菜品名称',true)
+  if (!qty||isNaN(+qty)||+qty<1) return showToast('请填写正确的数量',true)
+  if (!playerId) return showToast('请填写游戏ID',true)
+  if (!md||!mt) return showToast('请填写完成时间',true)
+  if (!ed||!et) return showToast('请填写取走截止时间',true)
+  const matureTs=new Date(`${md}T${mt}`).getTime(), expireTs=new Date(`${ed}T${et}`).getTime()
+  if (isNaN(matureTs)) return showToast('完成时间格式有误',true)
+  if (isNaN(expireTs)) return showToast('取走截止时间格式有误',true)
+  if (expireTs<=matureTs) return showToast('取走截止须晚于完成时间',true)
+  if (expireTs<=Date.now()) return showToast('取走截止时间已过期',true)
+  myOwnerId=playerId; localStorage.setItem(OWNER_KEY,myOwnerId); document.getElementById('myIdDisplay').textContent=myOwnerId
   showLoading(true)
   try {
-    const { error } = await sb.from('cook_posts').insert({
-      dish_name:   dishName,
-      quantity:    +qty,
-      player_id:   playerId,
-      mature_time: matureTs,
-      expire_time: expireTs,
-      category:    selectedCat,
-      note,
-      owner_id:    myOwnerId,
-      created_at:  Date.now(),
+    const {error}=await sb.from('cook_posts').insert({
+      dish_name:dishName, quantity:+qty, player_id:playerId,
+      mature_time:matureTs, expire_time:expireTs,
+      rarity:selectedRarity, note, owner_id:myOwnerId, created_at:Date.now()
     })
     if (error) throw error
-    closePublish()
-    showToast('发布成功！🍲')
-    ;['fDishName','fQty','fNote'].forEach(id => document.getElementById(id).value = '')
-  } catch(e) {
-    showToast('发布失败：' + (e.message||'请重试'), true)
-  } finally {
-    showLoading(false)
-  }
+    closePublish(); showToast('发布成功！🍲')
+    ;['fDishName','fQty','fNote'].forEach(id=>document.getElementById(id).value='')
+  } catch(e) { showToast('发布失败：'+(e.message||'请重试'),true) }
+  finally { showLoading(false) }
 }
 
-async function deletePost(e, id) {
+async function deletePost(e,id) {
   e.stopPropagation()
-  if (!confirm('确认删除这条菜品信息？')) return
+  if (!confirm('确认删除？')) return
   showLoading(true)
-  try {
-    const { error } = await sb.from('cook_posts').delete().eq('id', id)
-    if (error) throw error
-    showToast('已删除')
-  } catch(e) {
-    showToast('删除失败：' + (e.message||'请重试'), true)
-  } finally {
-    showLoading(false)
-  }
+  try { const {error}=await sb.from('cook_posts').delete().eq('id',id); if(error)throw error; showToast('已删除') }
+  catch(e) { showToast('删除失败',true) }
+  finally { showLoading(false) }
 }
 
 function openDetail(id) {
-  const p = filteredPosts.find(x => x.id === id)
-  if (!p) return
-  document.getElementById('detailTitle').textContent = `🍲 ${p.dishName}`
-  document.getElementById('detailBody').innerHTML = `
+  const p=filteredPosts.find(x=>x.id===id); if (!p) return
+  document.getElementById('detailTitle').textContent=`🍲 ${p.dishName}`
+  document.getElementById('detailBody').innerHTML=`
     <div class="detail-body">
       <div class="detail-dish-name">${esc(p.dishName)} <span style="font-size:14px;color:var(--text-dim)">×${p.quantity}</span></div>
-      <div style="margin-bottom:16px"><span class="cat-badge ${p.category}" style="position:static">${p.catLabel}</span></div>
+      <div style="margin-bottom:16px"><span class="rarity-badge ${p.rarity}" style="position:static">${p.rarityLabel}</span></div>
       <div class="detail-row"><span class="detail-key">玩家ID</span><span class="detail-val">${esc(p.playerId)}</span></div>
       <div class="detail-row"><span class="detail-key">状态</span><span class="detail-val">${p.statusLabel}</span></div>
       <div class="detail-row"><span class="detail-key">完成时间</span><span class="detail-val">${p.matureStr}</span></div>
       <div class="detail-row"><span class="detail-key">取走截止</span><span class="detail-val ${p.expireSoon?'soon':''}">${p.expireStr}</span></div>
       <div class="detail-row"><span class="detail-key">倒计时</span><span class="detail-val">${p.countdownStr}</span></div>
-      ${p.note ? `<div class="detail-note-box">💬 ${esc(p.note)}</div>` : ''}
-    </div>
-  `
+      ${p.note?`<div class="detail-note-box">💬 ${esc(p.note)}</div>`:''}
+    </div>`
   document.getElementById('detailModal').classList.add('open')
 }
 function closeDetail() { document.getElementById('detailModal').classList.remove('open') }
-function onMaskClick(e, id) { if (e.target === document.getElementById(id)) document.getElementById(id).classList.remove('open') }
+function onMaskClick(e,id) { if(e.target===document.getElementById(id)) document.getElementById(id).classList.remove('open') }
 
-function fmtDt(ts) {
-  const d = new Date(ts), pad = n => String(n).padStart(2,'0')
-  return `${d.getMonth()+1}/${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`
-}
-function fmtDur(ms) {
-  if (ms <= 0) return '0分钟'
-  const h = Math.floor(ms/3600000), m = Math.floor((ms%3600000)/60000)
-  return h > 0 ? `${h}小时${m>0?m+'分钟':''}` : `${m}分钟`
-}
+function fmtDt(ts) { const d=new Date(ts),pad=n=>String(n).padStart(2,'0'); return `${d.getMonth()+1}/${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}` }
+function fmtDur(ms) { if(ms<=0)return'0分钟'; const h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000); return h>0?`${h}小时${m>0?m+'分钟':''}`:`${m}分钟` }
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') }
-function showLoading(on) { document.getElementById('loading').classList.toggle('show', on) }
+function showLoading(on) { document.getElementById('loading').classList.toggle('show',on) }
 let toastTimer
-function showToast(msg, isErr=false) {
-  const el = document.getElementById('toast')
-  el.textContent = msg
-  el.className = 'toast show' + (isErr ? ' error' : '')
-  clearTimeout(toastTimer)
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2500)
-}
+function showToast(msg,isErr=false) { const el=document.getElementById('toast'); el.textContent=msg; el.className='toast show'+(isErr?' error':''); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),2500) }
 
 init()
 </script>
