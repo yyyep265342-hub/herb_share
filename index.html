@@ -663,14 +663,14 @@ h1 {
 <div class="toast" id="toast"></div>
 <div class="loading-overlay" id="loading"><div class="spinner"></div><span>施法中…</span></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 // ═══════════════════════════════════════════
 //  Supabase 配置
 // ═══════════════════════════════════════════
 const SUPABASE_URL = 'https://ygslzwiznvcfujonvblq.supabase.co'
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlnc2x6d2l6bnZjZnVqb252YmxxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNDM4NjksImV4cCI6MjA5NTYxOTg2OX0.J9P1NyK5tiSzPZgDeLpwfS2eRaFrP5Gb4fgpmA258vA'
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
 const OWNER_KEY = 'herb_share_owner_id'
 const FILTERS = [
