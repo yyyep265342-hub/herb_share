@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>草药互助广场 · 霍格沃茨</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Serif+SC:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #080f09;
+  --bg2:       #0d1a0e;
+  --bg3:       #111f12;
+  --border:    #1e3d20;
+  --border2:   #2d5a2f;
+  --green:     #4aaa4e;
+  --green-dim: #2d7a30;
+  --green-glow:#7fd87e;
+  --text:      #d8f0d8;
+  --text-dim:  #6a9a6c;
+  --gold:      #c8a44a;
+  --gold-dim:  #7a5a20;
+  --blue:      #5a9ad8;
+  --purple:    #9a5ad8;
+  --orange:    #d88a3a;
+  --red:       #d84a4a;
+  --radius:    16px;
+  --card-bg: linear-gradient(160deg, #0e1a0f 0%, #121e13 100%);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Serif SC', serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── 背景粒子层 ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 10%, rgba(45,120,48,.12) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 60% at 80% 80%, rgba(45,80,120,.08) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 30% at 60% 40%, rgba(74,170,78,.05) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.wrap { position: relative; z-index: 1; max-width: 780px; margin: 0 auto; padding: 0 16px 80px; }
+
+/* ── Header ── */
+header {
+  text-align: center;
+  padding: 56px 20px 36px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 28px;
+  position: relative;
+}
+header::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; left: 50%;
+  transform: translateX(-50%);
+  width: 120px; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--green), transparent);
+}
+.header-icon {
+  font-size: 56px;
+  display: block;
+  margin-bottom: 14px;
+  filter: drop-shadow(0 0 18px rgba(74,200,80,.55));
+  animation: float 4s ease-in-out infinite;
+}
+@keyframes float {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+h1 {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(22px, 5vw, 34px);
+  color: var(--green-glow);
+  letter-spacing: 6px;
+  text-shadow: 0 0 30px rgba(74,200,80,.4);
+  margin-bottom: 8px;
+}
+.header-sub {
+  font-size: 13px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+}
+
+/* ── 操作栏 ── */
+.action-bar {
+  position: sticky;
+  top: 0;
+  background: rgba(8,15,9,.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 0 0;
+  margin: 0 -16px 24px;
+  padding-left: 16px; padding-right: 16px;
+  z-index: 100;
+}
+.search-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.search-box {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 40px;
+  padding: 0 16px;
+  height: 42px;
+  gap: 8px;
+}
+.search-box input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+}
+.search-box input::placeholder { color: var(--text-dim); }
+.clear-btn { color: var(--text-dim); cursor: pointer; font-size: 13px; padding: 2px 4px; }
+.clear-btn:hover { color: var(--text); }
+
+.publish-btn {
+  background: linear-gradient(135deg, var(--green-dim), var(--green));
+  color: #fff;
+  border: none;
+  border-radius: 40px;
+  padding: 0 22px;
+  height: 42px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: 'Noto Serif SC', serif;
+  box-shadow: 0 4px 16px rgba(74,170,78,.3);
+  transition: transform .15s, box-shadow .15s;
+}
+.publish-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(74,170,78,.4); }
+.publish-btn:active { transform: translateY(0); }
+
+.filter-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 14px;
+  scrollbar-width: none;
+}
+.filter-scroll::-webkit-scrollbar { display: none; }
+.filter-tag {
+  white-space: nowrap;
+  padding: 6px 18px;
+  border-radius: 24px;
+  font-size: 13px;
+  color: var(--text-dim);
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all .15s;
+  font-family: 'Noto Serif SC', serif;
+}
+.filter-tag:hover { border-color: var(--border2); color: var(--text); }
+.filter-tag.active {
+  background: var(--green-dim);
+  color: #d8f8d8;
+  border-color: var(--green);
+  font-weight: 600;
+}
+
+/* ── 统计栏 ── */
+.stats-bar {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+.stats-bar span { color: var(--green-glow); font-weight: 600; }
+
+/* ── 帖子列表 ── */
+.post-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.empty-state {
+  text-align: center;
+  padding: 80px 0;
+  color: var(--text-dim);
+}
+.empty-state .ei { font-size: 60px; opacity: .35; display: block; margin-bottom: 16px; }
+.empty-state p { font-size: 15px; }
+
+/* ── 卡片 ── */
+.post-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color .2s, transform .15s, box-shadow .2s;
+  animation: fadeUp .3s ease both;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.post-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(74,170,78,.4), transparent);
+}
+.post-card:hover {
+  border-color: var(--border2);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0,0,0,.4);
+}
+
+/* 稀有度色带 */
+.post-card.rarity-common { border-left: 3px solid #4a8a4a; }
+.post-card.rarity-rare   { border-left: 3px solid var(--blue); }
+.post-card.rarity-epic   { border-left: 3px solid var(--purple); }
+.post-card.rarity-legend { border-left: 3px solid var(--gold); }
+
+.rarity-badge {
+  position: absolute;
+  top: 16px; right: 16px;
+  font-size: 11px;
+  padding: 3px 12px;
+  border-radius: 16px;
+  font-weight: 600;
+}
+.rarity-badge.common { background: #1a3a1a; color: #7ab87a; border: 1px solid #3a6a3a; }
+.rarity-badge.rare   { background: #1a2d4a; color: #7ab8f0; border: 1px solid #3a6aaa; }
+.rarity-badge.epic   { background: #2d1a4a; color: #c07af0; border: 1px solid #6a3aaa; }
+.rarity-badge.legend { background: #4a2d0a; color: #f0c070; border: 1px solid #aa7a3a; }
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding-right: 80px;
+}
+.herb-avatar {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: #1a3a1a;
+  border: 1px solid #3a6a3a;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px;
+  flex-shrink: 0;
+}
+.card-meta { flex: 1; }
+.herb-name { font-size: 18px; font-weight: 600; color: #a8e8a8; display: block; margin-bottom: 3px; }
+.player-id { font-size: 12px; color: var(--text-dim); }
+.qty-badge {
+  font-size: 16px; font-weight: 700;
+  color: var(--green-glow);
+  background: #1a3a1a;
+  border: 1px solid #3a6a3a;
+  border-radius: 8px;
+  padding: 3px 12px;
+}
+
+.card-times {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+  font-size: 12px;
+}
+.time-row { display: flex; justify-content: space-between; align-items: center; }
+.time-label { color: var(--text-dim); }
+.time-val { color: #a8d8a8; font-weight: 500; }
+.time-val.soon { color: var(--orange); }
+
+.progress-bar {
+  height: 4px;
+  background: #1a3a1a;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green-dim), var(--green-glow));
+  border-radius: 4px;
+  transition: width .3s;
+}
+
+.card-footer { display: flex; justify-content: space-between; align-items: center; }
+.status-badge { font-size: 12px; padding: 3px 12px; border-radius: 16px; }
+.status-badge.growing  { background: #1a2d4a; color: #70a8f0; }
+.status-badge.ready    { background: #1a3a1a; color: #70d870; }
+.status-badge.expiring { background: #4a2a0a; color: var(--orange); }
+.countdown { font-size: 12px; color: var(--text-dim); font-family: monospace; }
+
+.card-note {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: rgba(255,255,255,.03);
+  border-radius: 8px;
+  border-left: 2px solid var(--border2);
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+/* 删除按钮（仅自己的帖子） */
+.delete-btn {
+  position: absolute;
+  bottom: 16px; right: 16px;
+  background: rgba(200,50,50,.15);
+  border: 1px solid rgba(200,50,50,.3);
+  color: #d87070;
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  font-family: 'Noto Serif SC', serif;
+  transition: background .15s;
+}
+.delete-btn:hover { background: rgba(200,50,50,.3); }
+
+/* ── 弹窗 ── */
+.modal-mask {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.8);
+  z-index: 1000;
+  align-items: flex-end;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.modal-mask.open { display: flex; }
+.modal-box {
+  width: 100%;
+  max-width: 780px;
+  max-height: 92vh;
+  background: #0d1a0e;
+  border-radius: 24px 24px 0 0;
+  border-top: 2px solid var(--border2);
+  display: flex;
+  flex-direction: column;
+  animation: slideUp .25s ease;
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 24px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.modal-title { font-size: 20px; font-weight: 600; color: var(--green-glow); font-family: 'Cinzel', serif; }
+.modal-close { color: var(--text-dim); cursor: pointer; font-size: 20px; padding: 4px 8px; transition: color .15s; }
+.modal-close:hover { color: var(--text); }
+.modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border2) transparent;
+}
+.form-group { margin-bottom: 24px; }
+.form-label {
+  display: block;
+  font-size: 13px;
+  color: var(--green-glow);
+  margin-bottom: 8px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+.form-input, .form-textarea, .form-select {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 11px 16px;
+  font-size: 14px;
+  color: var(--text);
+  font-family: 'Noto Serif SC', serif;
+  outline: none;
+  transition: border-color .15s;
+}
+.form-input:focus, .form-textarea:focus, .form-select:focus { border-color: var(--green); }
+.form-input::placeholder, .form-textarea::placeholder { color: var(--text-dim); }
+.form-textarea { min-height: 80px; resize: vertical; }
+.form-select { cursor: pointer; }
+.form-select option { background: var(--bg3); }
+
+.picker-row { display: flex; gap: 10px; }
+.picker-row .form-input { flex: 1; }
+.picker-row input[type="date"],
+.picker-row input[type="time"] {
+  color-scheme: dark;
+}
+
+.rarity-picker { display: flex; gap: 8px; flex-wrap: wrap; }
+.rarity-opt {
+  padding: 8px 18px;
+  border-radius: 24px;
+  font-size: 13px;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  background: var(--bg3);
+  cursor: pointer;
+  transition: all .15s;
+  font-family: 'Noto Serif SC', serif;
+}
+.rarity-opt.sel-common { background: #1a3a1a; border-color: #7ab87a; color: #a8e8a8; }
+.rarity-opt.sel-rare   { background: #1a2d4a; border-color: #7ab8f0; color: #a8d8f0; }
+.rarity-opt.sel-epic   { background: #2d1a4a; border-color: #c07af0; color: #d8a8f0; }
+.rarity-opt.sel-legend { background: #4a2d0a; border-color: #f0c070; color: #f8e090; }
+
+.form-hint { font-size: 11px; color: var(--text-dim); margin-top: 5px; }
+
+.modal-footer {
+  display: flex;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+}
+.btn-cancel {
+  flex: 1;
+  padding: 13px;
+  text-align: center;
+  border-radius: 10px;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  color: var(--text-dim);
+  cursor: pointer;
+  font-family: 'Noto Serif SC', serif;
+  font-size: 14px;
+  transition: background .15s;
+}
+.btn-cancel:hover { background: #1a2e1b; }
+.btn-submit {
+  flex: 2;
+  padding: 13px;
+  text-align: center;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--green-dim), var(--green));
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Noto Serif SC', serif;
+  font-size: 14px;
+  border: none;
+  box-shadow: 0 4px 16px rgba(74,170,78,.35);
+  transition: opacity .15s;
+}
+.btn-submit:hover { opacity: .9; }
+
+/* ── 详情弹窗 ── */
+.detail-modal .modal-box { border-radius: 24px; margin: 20px; max-height: 80vh; align-self: center; }
+.detail-body { padding: 24px; }
+.detail-herb-name { font-size: 24px; font-weight: 700; color: #a8e8a8; margin-bottom: 6px; }
+.detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+.detail-row:last-child { border-bottom: none; }
+.detail-key { color: var(--text-dim); }
+.detail-val { color: var(--text); font-weight: 500; }
+.detail-note-box { margin-top: 14px; padding: 14px; background: rgba(255,255,255,.03); border-radius: 10px; font-size: 13px; line-height: 1.7; color: var(--text-dim); border-left: 2px solid var(--border2); }
+
+/* ── 本地身份 ── */
+.identity-bar {
+  background: rgba(13,26,14,.8);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 16px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+.identity-bar .id-val { color: var(--green-glow); font-weight: 600; }
+.identity-bar .change-id { margin-left: auto; cursor: pointer; color: var(--text-dim); text-decoration: underline; font-size: 12px; }
+.identity-bar .change-id:hover { color: var(--text); }
+
+/* ── Toast ── */
+.toast {
+  position: fixed;
+  bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: #1a3a1a;
+  color: var(--green-glow);
+  border: 1px solid var(--border2);
+  border-radius: 24px;
+  padding: 10px 24px;
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity .25s, transform .25s;
+  z-index: 9999;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.error { background: #3a1a1a; color: #f08080; border-color: #6a3a3a; }
+
+/* ── 加载 ── */
+.loading-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(8,15,9,.7);
+  z-index: 500;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 16px;
+  color: var(--green-glow);
+  font-size: 15px;
+}
+.loading-overlay.show { display: flex; }
+.spinner {
+  width: 40px; height: 40px;
+  border: 3px solid var(--border);
+  border-top-color: var(--green);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── 响应式 ── */
+@media (max-width: 480px) {
+  header { padding: 40px 16px 28px; }
+  h1 { letter-spacing: 3px; }
+  .post-card { padding: 18px; }
+  .card-header { gap: 12px; }
+  .herb-avatar { width: 44px; height: 44px; font-size: 22px; }
+  .modal-box { border-radius: 20px 20px 0 0; }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <span class="header-icon">🌿</span>
+    <h1>草药互助广场</h1>
+    <p class="header-sub">分享你的药圃 · 帮助同道中人</p>
+  </header>
+
+  <div class="action-bar">
+    <div class="search-row">
+      <div class="search-box">
+        <span>🔍</span>
+        <input id="searchInput" type="text" placeholder="搜索草药名称、玩家ID…" oninput="onSearch()">
+        <span class="clear-btn" id="clearBtn" onclick="clearSearch()" style="display:none">✕</span>
+      </div>
+      <button class="publish-btn" onclick="openPublish()">＋ 发布</button>
+    </div>
+    <div class="filter-scroll" id="filterScroll"></div>
+  </div>
+
+  <div class="identity-bar">
+    <span>🪄 当前身份：</span>
+    <span class="id-val" id="myIdDisplay">—</span>
+    <span class="change-id" onclick="changeId()">更改</span>
+  </div>
+
+  <div class="stats-bar" id="statsBar">
+    共 <span id="statTotal">0</span> 条发布 · 显示 <span id="statShown">0</span> 条
+  </div>
+
+  <div class="post-list" id="postList">
+    <div class="empty-state">
+      <span class="ei">🌱</span>
+      <p>正在加载草药信息…</p>
+    </div>
+  </div>
+</div>
+
+<!-- 发布弹窗 -->
+<div class="modal-mask" id="publishModal" onclick="onMaskClick(event,'publishModal')">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title">🌿 发布草药信息</span>
+      <span class="modal-close" onclick="closePublish()">✕</span>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">草药名称 *</label>
+        <input class="form-input" id="fHerbName" placeholder="如：玫瑰、羽衣草…">
+      </div>
+      <div class="form-group">
+        <label class="form-label">数量 *</label>
+        <input class="form-input" id="fQty" type="number" min="1" placeholder="可收取数量">
+      </div>
+      <div class="form-group">
+        <label class="form-label">你的游戏ID *</label>
+        <input class="form-input" id="fPlayerId" placeholder="方便其他玩家联系你">
+        <p class="form-hint">会自动记住，下次不用再填</p>
+      </div>
+      <div class="form-group">
+        <label class="form-label">成熟时间 *</label>
+        <div class="picker-row">
+          <input class="form-input" id="fMatureDate" type="date">
+          <input class="form-input" id="fMatureTime" type="time">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">收取截止时间 *</label>
+        <div class="picker-row">
+          <input class="form-input" id="fExpireDate" type="date">
+          <input class="form-input" id="fExpireTime" type="time">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">稀有度</label>
+        <div class="rarity-picker" id="rarityPicker">
+          <span class="rarity-opt sel-common" data-r="common" onclick="setRarity(this)">⚪ 普通</span>
+          <span class="rarity-opt" data-r="rare"   onclick="setRarity(this)">🔵 稀有</span>
+          <span class="rarity-opt" data-r="epic"   onclick="setRarity(this)">🟣 史诗</span>
+          <span class="rarity-opt" data-r="legend" onclick="setRarity(this)">🟡 传说</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">备注（可选）</label>
+        <textarea class="form-textarea" id="fNote" placeholder="其他说明，如交换需求等"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div class="btn-cancel" onclick="closePublish()">取消</div>
+      <div class="btn-submit" onclick="submitPost()">发布</div>
+    </div>
+  </div>
+</div>
+
+<!-- 详情弹窗 -->
+<div class="modal-mask detail-modal" id="detailModal" onclick="onMaskClick(event,'detailModal')">
+  <div class="modal-box" style="border-radius:24px;margin:20px;align-self:center;max-height:80vh;">
+    <div class="modal-header">
+      <span class="modal-title" id="detailTitle">草药详情</span>
+      <span class="modal-close" onclick="closeDetail()">✕</span>
+    </div>
+    <div class="modal-body" id="detailBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="loading-overlay" id="loading"><div class="spinner"></div><span>施法中…</span></div>
+
+<script>
+// ═══════════════════════════════════════════
+//  数据存储：localStorage（本地持久化）
+//  每个帖子结构：{ id, herbName, quantity, playerId,
+//                 matureTime, expireTime, rarity, note,
+//                 createdAt, ownerId }
+// ═══════════════════════════════════════════
+
+const STORAGE_KEY = 'herb_share_posts_v1';
+const OWNER_KEY   = 'herb_share_owner_id';
+const FILTERS = [
+  { id:'all',      label:'全部' },
+  { id:'ready',    label:'✅ 已成熟' },
+  { id:'growing',  label:'🌱 生长中' },
+  { id:'expiring', label:'⏰ 快收取' },
+  { id:'common',   label:'普通' },
+  { id:'rare',     label:'稀有' },
+  { id:'epic',     label:'史诗' },
+  { id:'legend',   label:'传说' },
+];
+const RARITY_LABELS = { common:'普通', rare:'稀有', epic:'史诗', legend:'传说' };
+const HERB_ICONS = {
+  default:'🌿', '玫瑰':'🌹', '灵芝':'🍄', '人参':'🌱', '薄荷':'🌿',
+  '龙血草':'🌺', '月见草':'🌙', '金银花':'🌼', '当归':'🍀',
+  '羽衣草':'🌿', '睡莲':'🪷', '向日葵':'🌻', '绣球花':'💐',
+  '牡丹':'🌸', '铃兰':'🌷', '五月花':'🌺',
+};
+
+let allPosts = [];
+let filteredPosts = [];
+let activeFilter = 'all';
+let searchKw = '';
+let selectedRarity = 'common';
+let myOwnerId = '';
+let timer = null;
+
+// ── 初始化 ──
+function init() {
+  myOwnerId = localStorage.getItem(OWNER_KEY) || '';
+  if (!myOwnerId) {
+    myOwnerId = 'user_' + Math.random().toString(36).slice(2,10);
+    localStorage.setItem(OWNER_KEY, myOwnerId);
+  }
+  document.getElementById('myIdDisplay').textContent = myOwnerId;
+
+  // 设置今天日期为默认值
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('fMatureDate').value = today;
+  document.getElementById('fExpireDate').value = today;
+
+  buildFilters();
+  loadPosts();
+  timer = setInterval(() => { recomputeStatus(); }, 30000);
+
+  // 监听 storage 事件（多标签同步）
+  window.addEventListener('storage', e => {
+    if (e.key === STORAGE_KEY) loadPosts();
+  });
+}
+
+// ── 身份管理 ──
+function changeId() {
+  const newId = prompt('输入新的游戏ID（将用于发布帖子）:', myOwnerId);
+  if (newId && newId.trim()) {
+    myOwnerId = newId.trim();
+    localStorage.setItem(OWNER_KEY, myOwnerId);
+    document.getElementById('myIdDisplay').textContent = myOwnerId;
+    document.getElementById('fPlayerId').value = myOwnerId;
+    showToast('身份已更新');
+  }
+}
+
+// ── 筛选标签 ──
+function buildFilters() {
+  const el = document.getElementById('filterScroll');
+  el.innerHTML = FILTERS.map(f =>
+    `<span class="filter-tag ${f.id==='all'?'active':''}" data-id="${f.id}" onclick="setFilter(this)">${f.label}</span>`
+  ).join('');
+}
+
+function setFilter(el) {
+  document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  activeFilter = el.dataset.id;
+  applyFilter();
+}
+
+// ── 数据加载 ──
+function loadPosts() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  const now = Date.now();
+  let posts = raw ? JSON.parse(raw) : [];
+  // 清理过期
+  posts = posts.filter(p => p.expireTime > now);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
+  allPosts = posts.map(p => processPost(p, now));
+  applyFilter();
+}
+
+function processPost(p, now) {
+  const isMature = now >= p.matureTime;
+  const timeLeft = p.expireTime - now;
+  const totalSpan = p.expireTime - p.matureTime;
+  const elapsed = now - p.matureTime;
+  const progressPct = (isMature && totalSpan > 0)
+    ? Math.min(100, Math.round(elapsed / totalSpan * 100)) : 0;
+  const expireSoon = timeLeft < 2 * 3600 * 1000;
+
+  let status, statusLabel;
+  if (!isMature)      { status='growing';  statusLabel='🌱 生长中'; }
+  else if (expireSoon){ status='expiring'; statusLabel='⚠️ 快收取'; }
+  else                { status='ready';    statusLabel='✅ 已成熟'; }
+
+  const countdownStr = !isMature
+    ? `还需 ${fmtDur(p.matureTime - now)} 成熟`
+    : `${fmtDur(timeLeft)} 后收取`;
+
+  return { ...p, status, statusLabel, countdownStr,
+    progressPct, expireSoon,
+    matureStr: fmtDt(p.matureTime),
+    expireStr:  fmtDt(p.expireTime),
+    rarityLabel: RARITY_LABELS[p.rarity] || '普通',
+    icon: HERB_ICONS[p.herbName] || HERB_ICONS.default,
+    isOwn: p.ownerId === myOwnerId,
+  };
+}
+
+function recomputeStatus() {
+  const now = Date.now();
+  allPosts = allPosts
+    .filter(p => p.expireTime > now)
+    .map(p => processPost(p, now));
+  // 同步清理 storage
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (raw) {
+    const clean = JSON.parse(raw).filter(p => p.expireTime > now);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(clean));
+  }
+  applyFilter();
+}
+
+// ── 搜索 & 筛选 ──
+function onSearch() {
+  searchKw = document.getElementById('searchInput').value;
+  document.getElementById('clearBtn').style.display = searchKw ? 'block' : 'none';
+  applyFilter();
+}
+
+function clearSearch() {
+  document.getElementById('searchInput').value = '';
+  searchKw = '';
+  document.getElementById('clearBtn').style.display = 'none';
+  applyFilter();
+}
+
+function applyFilter() {
+  let list = [...allPosts];
+  if (searchKw.trim()) {
+    const kw = searchKw.trim().toLowerCase();
+    list = list.filter(p =>
+      p.herbName.toLowerCase().includes(kw) ||
+      p.playerId.toLowerCase().includes(kw) ||
+      (p.note||'').toLowerCase().includes(kw)
+    );
+  }
+  if (activeFilter !== 'all') {
+    if (['growing','ready','expiring'].includes(activeFilter)) {
+      list = list.filter(p => p.status === activeFilter);
+    } else {
+      list = list.filter(p => p.rarity === activeFilter);
+    }
+  }
+  list.sort((a,b) => {
+    if (a.status==='ready' && b.status!=='ready') return -1;
+    if (b.status==='ready' && a.status!=='ready') return 1;
+    return a.expireTime - b.expireTime;
+  });
+  filteredPosts = list;
+  document.getElementById('statTotal').textContent = allPosts.length;
+  document.getElementById('statShown').textContent = list.length;
+  renderList();
+}
+
+// ── 渲染 ──
+function renderList() {
+  const el = document.getElementById('postList');
+  if (!filteredPosts.length) {
+    el.innerHTML = `<div class="empty-state"><span class="ei">🌱</span><p>暂无相关草药帖子</p></div>`;
+    return;
+  }
+  el.innerHTML = filteredPosts.map((p, i) => `
+    <div class="post-card rarity-${p.rarity}" style="animation-delay:${i*40}ms" onclick="openDetail('${p.id}')">
+      <span class="rarity-badge ${p.rarity}">${p.rarityLabel}</span>
+      <div class="card-header">
+        <div class="herb-avatar">${p.icon}</div>
+        <div class="card-meta">
+          <span class="herb-name">${esc(p.herbName)}</span>
+          <span class="player-id">玩家：${esc(p.playerId)}</span>
+        </div>
+        <span class="qty-badge">×${p.quantity}</span>
+      </div>
+      <div class="card-times">
+        <div class="time-row">
+          <span class="time-label">🌸 成熟时间</span>
+          <span class="time-val">${p.matureStr}</span>
+        </div>
+        <div class="time-row">
+          <span class="time-label">⏳ 收取截止</span>
+          <span class="time-val ${p.expireSoon?'soon':''}">${p.expireStr}</span>
+        </div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${p.progressPct}%"></div></div>
+      <div class="card-footer">
+        <span class="status-badge ${p.status}">${p.statusLabel}</span>
+        <span class="countdown">${p.countdownStr}</span>
+      </div>
+      ${p.note ? `<div class="card-note">💬 ${esc(p.note)}</div>` : ''}
+      ${p.isOwn ? `<span class="delete-btn" onclick="deletePost(event,'${p.id}')">删除</span>` : ''}
+    </div>
+  `).join('');
+}
+
+// ── 发布 ──
+function openPublish() {
+  // 预填游戏ID
+  if (myOwnerId && !myOwnerId.startsWith('user_')) {
+    document.getElementById('fPlayerId').value = myOwnerId;
+  }
+  // 预填今天日期
+  const today = new Date().toISOString().split('T')[0];
+  if (!document.getElementById('fMatureDate').value) document.getElementById('fMatureDate').value = today;
+  if (!document.getElementById('fExpireDate').value) document.getElementById('fExpireDate').value = today;
+  document.getElementById('publishModal').classList.add('open');
+}
+
+function closePublish() {
+  document.getElementById('publishModal').classList.remove('open');
+}
+
+function setRarity(el) {
+  document.querySelectorAll('#rarityPicker .rarity-opt').forEach(o => {
+    o.className = 'rarity-opt';
+  });
+  el.className = `rarity-opt sel-${el.dataset.r}`;
+  selectedRarity = el.dataset.r;
+}
+
+function submitPost() {
+  const herbName = document.getElementById('fHerbName').value.trim();
+  const qty      = document.getElementById('fQty').value.trim();
+  const playerId = document.getElementById('fPlayerId').value.trim();
+  const md = document.getElementById('fMatureDate').value;
+  const mt = document.getElementById('fMatureTime').value;
+  const ed = document.getElementById('fExpireDate').value;
+  const et = document.getElementById('fExpireTime').value;
+  const note = document.getElementById('fNote').value.trim();
+
+  if (!herbName) return showToast('请填写草药名称', true);
+  if (!qty || isNaN(+qty) || +qty < 1) return showToast('请填写正确的数量', true);
+  if (!playerId) return showToast('请填写游戏ID', true);
+  if (!md || !mt) return showToast('请填写成熟时间', true);
+  if (!ed || !et) return showToast('请填写收取截止时间', true);
+
+  const matureTs = new Date(`${md}T${mt}`).getTime();
+  const expireTs = new Date(`${ed}T${et}`).getTime();
+
+  if (isNaN(matureTs)) return showToast('成熟时间格式有误', true);
+  if (isNaN(expireTs)) return showToast('收取截止时间格式有误', true);
+  if (expireTs <= matureTs) return showToast('收取截止须晚于成熟时间', true);
+  if (expireTs <= Date.now()) return showToast('收取截止时间已过期', true);
+
+  // 保存游戏ID
+  if (!myOwnerId.startsWith('user_') || playerId !== myOwnerId) {
+    // 如果用户填了具体ID，用作身份
+  }
+  localStorage.setItem(OWNER_KEY, playerId);
+  myOwnerId = playerId;
+  document.getElementById('myIdDisplay').textContent = myOwnerId;
+
+  const newPost = {
+    id: 'p_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
+    herbName, quantity: +qty, playerId,
+    matureTime: matureTs, expireTime: expireTs,
+    rarity: selectedRarity, note,
+    createdAt: Date.now(),
+    ownerId: myOwnerId,
+  };
+
+  const raw = localStorage.getItem(STORAGE_KEY);
+  const posts = raw ? JSON.parse(raw) : [];
+  posts.push(newPost);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
+
+  closePublish();
+  showToast('发布成功！🌿');
+  // 清空表单
+  ['fHerbName','fQty','fNote'].forEach(id => document.getElementById(id).value = '');
+  loadPosts();
+}
+
+function deletePost(e, id) {
+  e.stopPropagation();
+  if (!confirm('确认删除这条草药信息？')) return;
+  const raw = localStorage.getItem(STORAGE_KEY);
+  const posts = raw ? JSON.parse(raw) : [];
+  const updated = posts.filter(p => p.id !== id);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+  showToast('已删除');
+  loadPosts();
+}
+
+// ── 详情 ──
+function openDetail(id) {
+  const p = filteredPosts.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('detailTitle').textContent = `🌿 ${p.herbName}`;
+  document.getElementById('detailBody').innerHTML = `
+    <div class="detail-body">
+      <div class="detail-herb-name">${esc(p.herbName)} <span style="font-size:14px;color:var(--text-dim)">×${p.quantity}</span></div>
+      <div style="margin-bottom:16px"><span class="rarity-badge ${p.rarity}" style="position:static">${p.rarityLabel}</span></div>
+      <div class="detail-row"><span class="detail-key">玩家ID</span><span class="detail-val">${esc(p.playerId)}</span></div>
+      <div class="detail-row"><span class="detail-key">状态</span><span class="detail-val">${p.statusLabel}</span></div>
+      <div class="detail-row"><span class="detail-key">成熟时间</span><span class="detail-val">${p.matureStr}</span></div>
+      <div class="detail-row"><span class="detail-key">收取截止</span><span class="detail-val ${p.expireSoon?'soon':''}">${p.expireStr}</span></div>
+      <div class="detail-row"><span class="detail-key">倒计时</span><span class="detail-val">${p.countdownStr}</span></div>
+      ${p.note ? `<div class="detail-note-box">💬 ${esc(p.note)}</div>` : ''}
+    </div>
+  `;
+  document.getElementById('detailModal').classList.add('open');
+}
+
+function closeDetail() {
+  document.getElementById('detailModal').classList.remove('open');
+}
+
+// ── 弹窗点击背景关闭 ──
+function onMaskClick(e, id) {
+  if (e.target === document.getElementById(id)) {
+    document.getElementById(id).classList.remove('open');
+  }
+}
+
+// ── 工具 ──
+function fmtDt(ts) {
+  const d = new Date(ts);
+  const pad = n => String(n).padStart(2,'0');
+  return `${d.getMonth()+1}/${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function fmtDur(ms) {
+  if (ms <= 0) return '0分钟';
+  const h = Math.floor(ms / 3600000);
+  const m = Math.floor((ms % 3600000) / 60000);
+  return h > 0 ? `${h}小时${m > 0 ? m+'分钟' : ''}` : `${m}分钟`;
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+let toastTimer;
+function showToast(msg, isErr=false) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (isErr ? ' error' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+init();
+</script>
+</body>
+</html>
