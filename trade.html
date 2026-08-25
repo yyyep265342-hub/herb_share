@@ -242,8 +242,10 @@ h1 { font-size: 26px; font-weight: 700; color: var(--gold-glow); letter-spacing:
       </div>
 
       <div class="form-group">
-        <label class="form-label">🪄 你的游戏ID *</label>
+        <label class="form-label">🪄 游戏昵称 *</label><input class="form-input" id="fNickname" placeholder="游戏内昵称">
+        <label class="form-label" style="margin-top:8px">游戏ID *</label>
         <input class="form-input" id="fGameId" placeholder="方便其他玩家联系你">
+        <label class="form-label" style="margin-top:8px">服务器 *</label><input class="form-input" id="fServer" placeholder="例如：亚太、国服一区">
       </div>
 
       <div class="form-group">
@@ -392,6 +394,8 @@ function processPost(p) {
   return {
     id: p.id,
     gameId: p.game_id,
+    nickname: p.game_nickname || '',
+    server: p.game_server || '',
     wantCard: p.want_card,
     wantCount: Math.max(1, Number(p.want_count) || 1),
     wantRarity: p.want_rarity || 'common',
@@ -449,7 +453,7 @@ function renderList() {
   el.innerHTML = filteredPosts.map((p, i) => `
     <div class="post-card rarity-${p.wantRarity}" style="animation-delay:${i*30}ms">
       <div class="post-header">
-        <span class="post-id">🪄 ${esc(p.gameId)}${!p.isOwn?`<span class="copy-id-btn" onclick="copyToClipboard('${esc(p.gameId)}', this)">📋 复制</span>`:''}</span>
+        <span class="post-id">🪄 ${esc(p.server)} · ${esc(p.nickname)} · ${esc(p.gameId)}${!p.isOwn?`<span class="copy-id-btn" onclick="copyToClipboard('${esc(p.gameId)}', this)">📋 复制ID</span>`:''}</span>
         <div class="post-header-right">
           ${p.match&&p.match.score?`<span class="match-badge ${p.match.mutual?'':'oneway'}">${p.match.mutual?'双向匹配':p.match.givesMe?'对方可补我':'我可补对方'}</span>`:''}
           <span class="post-rarity ${p.wantRarity}">${p.rarityLabel}</span>
@@ -479,6 +483,8 @@ function openPublish(editPost = null) {
   pendingOffers = editPost ? editPost.offers.map(o=>({card:o.card,count:o.count})) : [{ card:'', count:'' }]
   renderOfferInputs()
   document.getElementById('fGameId').value = myGameId || ''
+  document.getElementById('fNickname').value = editPost ? editPost.nickname : (localStorage.getItem('hogwarts_game_nickname')||'')
+  document.getElementById('fServer').value = editPost ? editPost.server : (localStorage.getItem('hogwarts_game_server')||'')
   document.getElementById('fRemark').value = editPost ? (editPost.remark||'') : ''
   document.getElementById('fWantCount').value = editPost ? editPost.wantCount : 1
   if (editPost) {
@@ -588,11 +594,13 @@ async function copyToClipboard(text, btnEl) {
 }
 
 async function submitPost() {
+  const nickname = document.getElementById('fNickname').value.trim()
   const gameId = document.getElementById('fGameId').value.trim()
+  const server = document.getElementById('fServer').value.trim()
   const wantCard = document.getElementById('fWantCard').value
   const wantCount = Math.max(1, Math.min(99, Number(document.getElementById('fWantCount').value) || 1))
   const remark = document.getElementById('fRemark').value.trim()
-  if (!gameId) return showToast('请填写游戏ID', true)
+  if (!nickname || !gameId || !server) return showToast('请完整填写游戏昵称、ID和服务器', true)
   if (!wantCard) return showToast('请选择想要的卡', true)
   const validOffers = pendingOffers.filter(o => o.card.trim()).map(o => ({ card: o.card.trim(), count: o.count.toString().trim() }))
   if (!validOffers.length) return showToast('请至少选择一张可换出的卡', true)
@@ -600,6 +608,7 @@ async function submitPost() {
 
   myGameId = gameId
   localStorage.setItem(GAME_ID_KEY, myGameId)
+  localStorage.setItem('hogwarts_game_nickname',nickname);localStorage.setItem('hogwarts_game_server',server)
   document.getElementById('myIdDisplay').textContent = myGameId
 
   showLoading(true)
@@ -607,6 +616,8 @@ async function submitPost() {
     if (editingPostId) {
       const { error } = await sb.from('trade_posts').update({
         game_id: gameId,
+        game_nickname: nickname,
+        game_server: server,
         want_card: wantCard,
         want_count: wantCount,
         want_rarity: selectedRarity,
@@ -618,6 +629,8 @@ async function submitPost() {
     } else {
       const row = {
         game_id: gameId,
+        game_nickname: nickname,
+        game_server: server,
         want_card: wantCard,
         want_count: wantCount,
         want_rarity: selectedRarity,
@@ -671,7 +684,7 @@ function showToast(msg, isErr=false) {
 async function completePost(id){if(!confirm('标记为已完成并从列表隐藏？'))return;const ownerColumn=myLocalIdentity?'owner_id':'user_id',query=sb.from('trade_posts').update({completed_at:Date.now()}).eq('id',id).eq(ownerColumn,myOwnerId),{error}=await query;if(error)return showToast('操作失败：'+error.message,true);showToast('已完成')}
 async function moderatePost(id){try{if(await HW.report(sb,'trade',id)){allPosts=allPosts.filter(p=>String(p.id)!==String(id));applyFilter();showToast('已举报并屏蔽')}}catch(err){showToast('举报失败：'+err.message,true)}}
 HW.mountMiniProgramEntry(sb,'trade')
-init().then(async()=>{try{const imported=await HW.consumeScene(sb);if(imported){matchPlan={rarity:imported.rarity||'legend',wantCard:imported.wantCard||'',wantQuantity:Math.max(1,Number(imported.wantQuantity)||1),offers:imported.offers||[]};localStorage.setItem(MATCH_PLAN_KEY,JSON.stringify(matchPlan));applyFilter();openPublish();const el=document.querySelector(`#rarityPicker [data-r="${imported.rarity||'legend'}"]`);if(el)setRarity(el);document.getElementById('fGameId').value=imported.gameId||'';document.getElementById('fWantCount').value=matchPlan.wantQuantity;document.getElementById('fRemark').value=imported.note||'';pendingOffers=(imported.offers||[]).map(x=>({card:x.name,count:String(x.quantity||1)}));renderOfferInputs();setTimeout(()=>document.getElementById('fWantCard').value=imported.wantCard||'',0);showToast('已导入方案，并完成智能匹配排序');return}if(HW.shouldPublish()){openPublish();const p=HW.params(),rarity=p.get('rarity');if(rarity){const el=document.querySelector(`#rarityPicker [data-r="${rarity}"]`);if(el)setRarity(el)}const want=p.get('want');if(want)setTimeout(()=>document.getElementById('fWantCard').value=want,0);const offers=HW.importedItems('offers');if(offers.length){pendingOffers=offers.map(card=>({card,count:'1'}));renderOfferInputs()}HW.sourceNotice(showToast)}}catch(e){showToast(e.message,true)}})
+init().then(async()=>{try{const imported=await HW.consumeScene(sb);if(imported){matchPlan={rarity:imported.rarity||'legend',wantCard:imported.wantCard||'',wantQuantity:Math.max(1,Number(imported.wantQuantity)||1),offers:imported.offers||[]};localStorage.setItem(MATCH_PLAN_KEY,JSON.stringify(matchPlan));applyFilter();openPublish();const el=document.querySelector(`#rarityPicker [data-r="${imported.rarity||'legend'}"]`);if(el)setRarity(el);document.getElementById('fNickname').value=imported.nickname||'';document.getElementById('fGameId').value=imported.gameId||'';document.getElementById('fServer').value=imported.server||'';document.getElementById('fWantCount').value=matchPlan.wantQuantity;document.getElementById('fRemark').value=imported.note||'';pendingOffers=(imported.offers||[]).map(x=>({card:x.name,count:String(x.quantity||1)}));renderOfferInputs();setTimeout(()=>document.getElementById('fWantCard').value=imported.wantCard||'',0);showToast('已导入账号与方案，并完成智能匹配排序');return}if(HW.shouldPublish()){openPublish();const p=HW.params(),rarity=p.get('rarity');if(rarity){const el=document.querySelector(`#rarityPicker [data-r="${rarity}"]`);if(el)setRarity(el)}const want=p.get('want');if(want)setTimeout(()=>document.getElementById('fWantCard').value=want,0);const offers=HW.importedItems('offers');if(offers.length){pendingOffers=offers.map(card=>({card,count:'1'}));renderOfferInputs()}HW.sourceNotice(showToast)}}catch(e){showToast(e.message,true)}})
 </script>
 </body>
 </html>
